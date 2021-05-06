@@ -950,8 +950,10 @@
       clamp = function (a, min, max) {
         return Math.min(Math.max(a, min), max);
       };
-      for (i = _i = 0; _i < 1000; i = ++_i) {
-        t = i / 1000;
+      for (i = _i = 0; _i < 2000; i = ++_i) {
+        // Update from 1000 to 2000 steps to mitigate the need for missingValues()
+        // which has an off-by-1 error causing a fault
+        t = i / 2000;
         prev = controlPoints;
         while (prev.length > 1) {
           next = [];
@@ -1032,7 +1034,12 @@
             leftCoord = [i - 1, ret[i - 1]];
             for (j = _j = i; i <= endX ? _j <= endX : _j >= endX; j = i <= endX ? ++_j : --_j) {
               if (values[j] != null) {
+                // Never runs because we only get here when values[j] IS null, so rightCoord is undefined
                 rightCoord = [j, values[j]];
+                break;
+              } else {
+                console.log("Running failsafe")
+                rightCoord = [j, values[j - 1]];  //rightCoord guarantees j-1 is still in bounds
                 break;
               }
             }
