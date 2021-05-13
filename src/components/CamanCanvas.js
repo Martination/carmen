@@ -19,8 +19,9 @@ const caman = window.Caman;
 
 // window.Caman.DEBUG = true
 
+// let image = "WP.png";
 let image = "142.jpg";
-let htmlCanvas = "#canvas-id"
+let htmlCanvas = "#canvas"
 // let canvas =
 caman(htmlCanvas, image, function () {
   this.render();
@@ -128,16 +129,15 @@ const CamanCanvas = () => {
 
   return (
     <>
-      <div className="edit-pane container p-4">
-        <p><img alt="before" id="img-id" src={image}></img> Before</p>
-        <p><img alt="after" id="canvas-id" src={image}></img> After</p>
+      <div className="edit-pane bg-gray container-lg text-center p-4 lh-1">
+        <img alt="Editing Canvas" className="img-fluid" id="canvas" src={image}></img>
       </div>
 
-      <div id="filterList" className="container text-center">
-        <div className="row row-cols-1 row-cols-md-2 center">
-
-          {createFilterList(adjustmentList, updateFilters)}
-
+      <div id="filterHolder">
+        <div id="filterList" className="container bg-dark text-center my-3 p-2">
+          <div className="row row-cols-1 row-cols-md-2 center">
+            {createFilterList(adjustmentList, updateFilters)}
+          </div>
         </div>
       </div>
     </>

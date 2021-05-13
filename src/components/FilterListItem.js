@@ -14,13 +14,19 @@ const FilterListItem = ({ filter, range, adjustmentList, onChange }) => {
   return (
     <div className="col">
       <div className="row gx-1 hover">
-        <label name={filter} className="col-3" onClick={(event) => resetValue(event, init, onChange)}>{filter}</label>
+
+        <label name={filter} className="col-3"
+          onClick={(event) => resetValue(event, init, onChange)}>{filter}</label>
+
         <div className="col-8">
           <input id={filter} name={filter} className="form-range slider"
             type="range" min={min} max={max} step={step}
             value={curValue} onChange={(event) => onChange(event, init)} />
         </div>
-        <span name={filter} className="col-1" onClick={(event) => resetValue(event, init, onChange)}>{curValue}</span>
+
+        <span name={filter} className="col-1"
+          onClick={(event) => resetValue(event, init, onChange)}>{curValue}</span>
+
       </div>
     </div>
   );

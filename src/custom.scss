@@ -1,17 +1,26 @@
 $primary: #6f42c1;
-$light: #e9ecef;
-$body-bg: #111;
-$body-color: #ccc;
+// $light: #e9ecef;
+$body-bg: #0e0e10;
+// $dark: #252525;
+// $body-color: #ccc;
 $mid-gray: #808080;
+
+@import "~bootstrap/scss/bootstrap.scss";
+@import "~bootstrap-icons/font/bootstrap-icons.css";
 
 .edit-pane {
   background: $mid-gray;
+  // background: $gray-600;
+}
+
+#canvas {
+  min-height: 250px;
 }
 
 .slider {
   opacity: 0.7;
-  -webkit-transition: opacity 0.2s;
   transition: 0.2s;
+  -webkit-transition: opacity 0.2s;
   cursor: pointer;
 }
 
@@ -19,9 +28,11 @@ $mid-gray: #808080;
   opacity: 1;
 }
 
-label {
-  text-transform: capitalize;
+#filterHolder {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
-@import "~bootstrap/scss/bootstrap.scss";
-@import "~bootstrap-icons/font/bootstrap-icons.css";
+#filterList label {
+  text-transform: capitalize;
+}

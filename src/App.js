@@ -3,11 +3,14 @@ import CamanCanvas from './components/CamanCanvas'
 function App() {
 
   return (
-    <div className="App container dark-gray mt-5">
-      <h1 className="text-primary">
-        <i className="bi bi-image-fill"></i> Caman + React
+    <div className="App text-light">
+
+      <div className="container bg-dark px-4 py-1 my-3">
+        <h1 className="text-primary display-2">
+          <i className="bi bi-image-fill"></i> Caman + React
         </h1>
-      <p>Header Text Here</p>
+        <p>Header Text Here</p>
+      </div>
 
       <CamanCanvas />
 
