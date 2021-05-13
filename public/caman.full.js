@@ -1999,8 +1999,10 @@
       adjustSize = Math.sqrt(adjust.length);
       kernel = [];
       Log.debug("Rendering kernel - Filter: " + this.currentJob.name);
-      start = Math.max(start, this.c.dimensions.width * 4 * ((adjustSize - 1) / 2));
-      end = Math.min(end, n - (this.c.dimensions.width * 4 * ((adjustSize - 1) / 2)));
+      // Skips over the first and last line making them transparent during sharpening
+      // start = Math.max(start, this.c.dimensions.width * 4 * ((adjustSize - 1) / 2));
+      // end = Math.min(end, n - (this.c.dimensions.width * 4 * ((adjustSize - 1) / 2)));
+
       builder = (adjustSize - 1) / 2;
       pixel = new Pixel();
       pixel.setContext(this.c);
