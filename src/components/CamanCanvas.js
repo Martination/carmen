@@ -16,15 +16,29 @@ const caman = window.Caman;
 // boxBlur?, heavyRadialBlur, gaussianBlur, motionBlur,
 // edgeEnhance, edgeDetect, emboss, posterize,
 
+
+// window.Caman.DEBUG = true
+
+let image = "142.jpg";
+let htmlCanvas = "#canvas-id"
+// let canvas =
+caman(htmlCanvas, image, function () {
+  this.render();
+});
+
+let lastExecution = 0;
+const delay = 100; // debounce for 100ms (limit excessive rendering)
+
 const CamanCanvas = () => {
 
-  // window.Caman.DEBUG = true
-
-  let image = "142.jpg";
-  let htmlCanvas = "#canvas-id"
-  let canvas = caman(htmlCanvas, image, function () {
-    this.render();
-  });
+  /* Update the image after our adjustments change */
+  const [adjustmentList, setAdjustmentList] = useState({});
+  useEffect(() => {
+    if ((lastExecution + delay) < Date.now()) {
+      updateImage(adjustmentList);
+      lastExecution = Date.now();
+    }
+  }, [adjustmentList]);
 
 
   function createFilterList(adjustmentList, onChange) {
@@ -32,23 +46,23 @@ const CamanCanvas = () => {
     const filtersFullRange = ["brightness", "contrast", "vibrance", "saturation", "exposure"];
     // 0 to 100
     const filtersHalfRange = ["hue", "sepia", "noise", "sharpen", "clip"];
-    const filtersSpecial = { "gamma": { "min": 0, "default": 1, "max": 10, "step": 0.1 } };
+    const filtersSpecial = { "gamma": { "min": 0, "init": 1, "max": 10, "step": 0.1 } };
 
-    const presets = [
-      "vintage", "lomo", "clarity", "sinCity", "sunrise", "crossProcess", "orangePeel",
-      "love", "grungy", "jarques", "pinhole", "oldBoot", "glowingSun",
-      "hazyDays", "herMajesty", "nostalgia", "hemingway", "concentrate"
-    ];
+    // const presets = [
+    //   "vintage", "lomo", "clarity", "sinCity", "sunrise", "crossProcess", "orangePeel",
+    //   "love", "grungy", "jarques", "pinhole", "oldBoot", "glowingSun",
+    //   "hazyDays", "herMajesty", "nostalgia", "hemingway", "concentrate"
+    // ];
 
     let rangeList = {}
 
-    const rangeFull = { "min": -100, "default": 0, "max": 100 }
+    const rangeFull = { "min": -100, "init": 0, "max": 100 }
     // Must be for...of; for...in replaces names with indicies
     for (const filter of filtersFullRange) { rangeList[filter] = rangeFull; }
 
-    // const rangeHalf = { "min": 0, "default": 0, "max": 100 }
-    // for (filter of filtersHalfRange) { rangeList[filter] = rangeHalf; }
-    // rangeList = { ...rangeList, ...filtersSpecial };
+    const rangeHalf = { "min": 0, "init": 0, "max": 100 }
+    for (const filter of filtersHalfRange) { rangeList[filter] = rangeHalf; }
+    rangeList = { ...rangeList, ...filtersSpecial };
     // console.log(rangeList);
 
     const filters = [];
@@ -56,44 +70,56 @@ const CamanCanvas = () => {
     for (const filter in rangeList) {
       // console.log(filter, rangeList[filter])
       filters.push(
-        <FilterListItem key={filter} filter={filter} adjustmentList={adjustmentList} onChange={onChange} />
+        <FilterListItem key={filter} filter={filter} range={rangeList[filter]}
+          adjustmentList={adjustmentList} onChange={onChange} />
       )
     }
 
     return filters;
   }
 
-  const [adjustmentList, setAdjustmentList] = useState({});
-
-  /* Update the image after our adjustments change */
-  useEffect(() => {
-    updateImage(adjustmentList);
-  }, [adjustmentList]);
-
   /* Sliders Callback */
-  const updateFilters = (event) => {
-    // console.log(event);
-
-    const filter = event.target.id;
+  const updateFilters = (event, init) => {
+    const filter = event.target.name;
+    const value = parseFloat(event.target.value);
     console.log("Updating", filter);
 
-    const value = parseInt(event.target.value);
-    const newList = { ...adjustmentList, [filter]: value };
-    setAdjustmentList(newList);
+    let newList;
+    if (value === init) {
+      console.log(`Reset ${filter} to default`)
+      newList = { ...adjustmentList };
+      delete newList[filter];
+    }
+    else {
+      newList = { ...adjustmentList, [filter]: value };
+    }
+
+    if (JSON.stringify(newList) !== JSON.stringify(adjustmentList)) {
+      setAdjustmentList(newList);
+    }
   }
 
   function updateImage(adjustmentList) {
-
     caman(htmlCanvas, function () {
       console.log("~~~~ UPDATE IMAGE ~~~~")
       console.log(adjustmentList)
 
       this.revert(false);
-      for (const adjustment in adjustmentList) {
-        if (this[adjustment]) this[adjustment](adjustmentList[adjustment]);
-        else console.log(`${adjustment} is not a valid filter.`);   // Maybe delete invalid filter?
-        // this[adjustment.filter](adjustment.value);
+      for (const filter in adjustmentList) {
         // console.log(`${filter}: ${adjustmentList[filter]}`);
+
+        if (this[filter]) {
+          this[filter](adjustmentList[filter]);
+        } else {
+          console.log(`${filter} is not a valid filter.`);
+          let newList = { ...adjustmentList };
+          delete newList[filter];
+          // Invalid filters will usually be at the end of the list because they get removed each render
+          // So we can just render and it will look okay until the updated re-render
+          this.render();
+          setAdjustmentList(newList);
+          return;
+        }
       }
       this.render();
     });
@@ -109,15 +135,6 @@ const CamanCanvas = () => {
 
       <div id="filterList" className="container text-center">
         <div className="row row-cols-1 row-cols-md-2 center">
-
-          {/* <FilterListItem filter={"brightness"} adjustmentList={adjustmentList} onChange={updateFilters} />
-          <FilterListItem filter={"contrast"} adjustmentList={adjustmentList} onChange={updateFilters} />
-          <FilterListItem filter={"vibrance"} adjustmentList={adjustmentList} onChange={updateFilters} />
-
-          <FilterListItem filter={"test"} adjustmentList={adjustmentList} onChange={updateFilters} />
-
-          <FilterListItem filter={"saturation"} adjustmentList={adjustmentList} onChange={updateFilters} />
-          <FilterListItem filter={"exposure"} adjustmentList={adjustmentList} onChange={updateFilters} /> */}
 
           {createFilterList(adjustmentList, updateFilters)}
 
