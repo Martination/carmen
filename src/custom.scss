@@ -29,8 +29,9 @@ $mid-gray: #808080;
 }
 
 #filterHolder {
-  max-width: 100%;
-  overflow-x: hidden;
+  counter-reset: none;
+  // max-width: 100%;
+  // overflow-x: hidden;
 }
 
 #filterList label {
