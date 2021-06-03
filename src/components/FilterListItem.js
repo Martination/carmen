@@ -9,7 +9,7 @@ const FilterListItem = ({ filter, range, filterList, onChange }) => {
   const max = range["max"] != null ? range["max"] : 100;
   const step = range["step"] || 1;
   const init = range["init"] || 0;
-  const curValue = filterList[filter] != null ? filterList[filter] : init;
+  const curValue = (filterList[filter] != null) ? filterList[filter] : init;
 
   return (
     <div className="col">

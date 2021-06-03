@@ -15,34 +15,11 @@ const caman = window.Caman;
 // Greyscale(), Invert()
 
 // Stage 2
-// Crop, Resize, Preset strength
+// Crop, Resize, Preset strength, undo/redo
 // vignette, rectangularVignette, tiltShift, radialBlur,
 // boxBlur?, heavyRadialBlur, gaussianBlur, motionBlur,
 // edgeEnhance, edgeDetect, emboss, posterize,
 
-
-// function PresetButtonOrig({ preset, onClick }) {
-//   var [button, setButton] = useState(false);
-//   const buttonRef = useRef();
-
-//   useEffect(() => {
-//     var myButton = buttonRef.current
-//     var bsButton = Button.getInstance(myButton)
-
-//     if (!bsButton) { bsButton = new Button(myButton, { toggle: "button" }) }
-//     else { bsButton.toggle(); }
-
-//   }, [button])
-
-//   return (
-//     <div className="col p-1 d-grid">
-//       <button className="btn btn-primary" ref={buttonRef} id={preset}
-//         onClick={(event) => { setButton(!button); onClick(event) }} type="button">
-//         {`${button ? 'on' : 'off'} - ${preset}`}
-//       </button>
-//     </div >
-//   )
-// }
 
 // To Do: Change list of presets to include pretty names
 function PresetButton({ preset, presetName, onClick, active }) {
@@ -75,7 +52,6 @@ function CreatePresetList({ presetList, onClick }) {
     "Love", "Grungy", "Jarques", "Pinhole", "Old Boot", "Glowing Sun",
     "Hazy Days", "Her Majesty", "Nostalgia", "Hemingway", "Concentrate"
   ];
-
 
   let buttonList = []
   for (const [index, preset] of presets.entries()) {
@@ -119,11 +95,9 @@ function createFilterList(filterList, onChange) {
 
 
 // window.Caman.DEBUG = true
-
 // let image = "WP.png";
 let image = "142.jpg";
 let htmlCanvas = "#canvas"
-// let canvas =
 caman(htmlCanvas, image, function () {
   this.render();
 });
@@ -169,21 +143,20 @@ const CamanCanvas = () => {
       console.log(`Reset ${filter} to default`)
       newList = { ...filterList };
       delete newList[filter];
-    }
-    else {
+    } else {
       newList = { ...filterList, [filter]: value };
     }
 
-    if (JSON.stringify(newList) !== JSON.stringify(filterList)) {
-      setFilterList(newList);
-    }
+    // if (JSON.stringify(newList) !== JSON.stringify(filterList)) {
+    setFilterList(newList);
+    // }
   }
 
   /* Button Callback */
   const updatePresets = (event) => {
     const preset = event.target.id;
 
-    console.log("Updating preset", preset);
+    // console.log("Updating preset", preset);
 
     let currentPresets = {};
     if (!presetList[preset]) { currentPresets[preset] = 1; }
@@ -198,7 +171,6 @@ const CamanCanvas = () => {
 
       this.revert(false);
       for (const filter in adjustmentList) {
-        // console.log(`${filter}: ${adjustmentList[filter]}`);
 
         if (this[filter]) {
           this[filter](adjustmentList[filter]);
@@ -226,34 +198,27 @@ const CamanCanvas = () => {
 
       <div id="filterHolder">
         <div id="filterList" className="container overflow-hidden bg-dark text-center my-3 p-2">
+
           <div className="row row-cols-1 row-cols-md-2 center">
             {createFilterList(filterList, updateFilters)}
           </div>
 
           <hr />
-
           <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 m-1">
-            {/* <PresetButtonOrig preset={"lomo"} onClick={updatePresets} />
-            <PresetButtonOrig preset={"hazyDays"} onClick={updatePresets} />
-            <PresetButtonOrig preset={"vintage"} onClick={updatePresets} /> */}
-            {/* <PresetButton preset={"vintage"} onClick={updatePresets} /> */}
             <CreatePresetList presetList={presetList} onClick={updatePresets} />
           </div>
 
           <hr />
-
           <div className="py-2">
             <button className="btn btn-primary" data-bs-target="#collapseTarget" data-bs-toggle="collapse">
               Toggle collapse
-        </button>
+            </button>
             <div className="collapse" id="collapseTarget">
               This is the toggle-able content!
-        </div>
+            </div>
           </div>
 
         </div>
-
-
       </div>
 
     </>
