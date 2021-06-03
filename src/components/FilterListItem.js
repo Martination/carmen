@@ -4,12 +4,12 @@ const resetValue = (event, init, onChange) => {
   onChange(event, init);
 }
 
-const FilterListItem = ({ filter, range, adjustmentList, onChange }) => {
+const FilterListItem = ({ filter, range, filterList, onChange }) => {
   const min = range["min"] != null ? range["min"] : -100;
   const max = range["max"] != null ? range["max"] : 100;
   const step = range["step"] || 1;
   const init = range["init"] || 0;
-  const curValue = adjustmentList[filter] != null ? adjustmentList[filter] : init;
+  const curValue = filterList[filter] != null ? filterList[filter] : init;
 
   return (
     <div className="col">

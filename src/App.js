@@ -9,7 +9,6 @@ function App() {
         <h1 className="text-primary display-2">
           <i className="bi bi-image-fill"></i> Caman + React
         </h1>
-        <p>Header Text Here</p>
       </div>
 
       <CamanCanvas />
