@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from 'bootstrap';
+import throttle from 'lodash/throttle';
 
 import FilterListItem from './FilterListItem'
-import usePrevious from './usePrevious'
+// import usePrevious from './usePrevious'
 const caman = window.Caman;
 
 
@@ -95,40 +96,70 @@ function createFilterList(filterList, onChange) {
 
 
 // window.Caman.DEBUG = true
-// let image = "WP.png";
-let image = "142.jpg";
+let image = "WP.png";
+// let image = "142.jpg";
 let htmlCanvas = "#canvas"
 caman(htmlCanvas, image, function () {
   this.render();
 });
 
-let lastExecution = 0;
-const delay = 100; // debounce for 100ms (limit excessive rendering)
-// Currently debounce doesn't work - it won't update to the most recent
-// if it's changing quickly
+let isRendering = false;
+let prevRenderList = {}, curRenderList = {};
+let backlog = 0;
+let updateImgFn = () => { };
+const throttledEventListen = throttle((curRenderList) => (updateImgFn(curRenderList)), 1000);
+
+caman.Event.listen("processStart", function (job) {
+  // console.log("Start:", job.name);
+  isRendering = true;
+});
+
+caman.Event.listen("processComplete", function (job) {
+  // console.log("Finish:", job.name);
+  isRendering = false;
+  backlog = 0;
+  if (JSON.stringify(prevRenderList) !== JSON.stringify(curRenderList)) {
+    // console.log("Updating from prev render", prevRenderList, curRenderList)
+    // updateImgFn(curRenderList);
+    throttledEventListen(curRenderList);
+  }
+});
+
 
 const CamanCanvas = () => {
+  updateImgFn = updateImage;  // Save function so Caman Event listener can call it
 
   /* Update the image after our adjustments change */
   const [presetList, setPresetList] = useState({});
   const [filterList, setFilterList] = useState({});
   const [adjustmentList, setAdjustmentList] = useState({});
 
-  const prevList = usePrevious(adjustmentList);
+  // Throttled could take an options object, but it appears to work fine with default
+  const throttled = useRef(throttle((adjustmentList) => (updateImage(adjustmentList)), 100));
+  // const prevList = usePrevious(adjustmentList);
   useEffect(() => {
-    // console.log("Updating")
-    if (JSON.stringify(prevList) !== JSON.stringify(adjustmentList)
-      && (lastExecution + delay) < Date.now()) {
-      // console.log("Goin")
-      updateImage(adjustmentList);
-      lastExecution = Date.now();
+    // if (JSON.stringify(prevList) !== JSON.stringify(adjustmentList)) {
+    if (JSON.stringify(prevRenderList) !== JSON.stringify(adjustmentList)) {
+
+      if (!isRendering) {
+        if (backlog) {
+          isRendering = true;
+        }
+        // console.log("Throttle rendering with", adjustmentList, backlog);
+        throttled.current(adjustmentList);
+        backlog += 1;
+      }
+      // else {
+      //   console.log("Skipped, rendering");
+      // }
+
     }
-  }, [adjustmentList, prevList]);
+  }, [adjustmentList]);
 
   /* Combine presets and filters into master adjustment list */
   useEffect(() => {
     const newList = { ...presetList, ...filterList }
-    setAdjustmentList(newList);
+    setAdjustmentList(curRenderList = newList);
   }, [filterList, presetList]);
 
 
@@ -165,6 +196,7 @@ const CamanCanvas = () => {
   }
 
   function updateImage(adjustmentList) {
+    prevRenderList = adjustmentList;
     caman(htmlCanvas, function () {
       console.log("~~~~ UPDATE IMAGE ~~~~")
       console.log(adjustmentList)
