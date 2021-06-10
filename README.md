@@ -8,7 +8,7 @@ The webpage is built using [React 17](https://reactjs.org/) & [Bootstrap 5](http
 
 ## Purpose
 
-I built this app to gain hands-on experience with React and Bootstrap, some of the most prolific web technologies out there. I wanted to make a website that was easy to use, actually useful, and secure.
+I built this app to gain hands-on experience with React and Bootstrap, some of the most prolific web technologies out there. I wanted to make a website that was easy to use, actually useful, and secure. \
 While there are many online photo editing websites, they are either clunky, hard to navigate, or insecure. Being a one-page app that is entirely run locally, that fixes the issues.
 
 ## To Do list
@@ -27,7 +27,7 @@ While there are many online photo editing websites, they are either clunky, hard
 
 ## Acknowledgements
 
-CamanJS is licensed under a BSD-3 License by Ryan LeFevre.
+CamanJS is licensed under a BSD-3 License by Ryan LeFevre. \
 Test pictures from [Place Kitten](https://placekitten.com/) and Among Trees artist [Mikael Gustaffson](https://www.instagram.com/p/BXa3JfChZl2/).
 
 ---
