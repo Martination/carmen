@@ -1,0 +1,24 @@
+{
+  "files": {
+    "main.css": "/carmen/static/css/main.a5530693.chunk.css",
+    "main.js": "/carmen/static/js/main.b4c4ccab.chunk.js",
+    "main.js.map": "/carmen/static/js/main.b4c4ccab.chunk.js.map",
+    "runtime-main.js": "/carmen/static/js/runtime-main.54ff20d2.js",
+    "runtime-main.js.map": "/carmen/static/js/runtime-main.54ff20d2.js.map",
+    "static/css/2.b8bff687.chunk.css": "/carmen/static/css/2.b8bff687.chunk.css",
+    "static/js/2.dac57b15.chunk.js": "/carmen/static/js/2.dac57b15.chunk.js",
+    "static/js/2.dac57b15.chunk.js.map": "/carmen/static/js/2.dac57b15.chunk.js.map",
+    "index.html": "/carmen/index.html",
+    "static/css/2.b8bff687.chunk.css.map": "/carmen/static/css/2.b8bff687.chunk.css.map",
+    "static/css/main.a5530693.chunk.css.map": "/carmen/static/css/main.a5530693.chunk.css.map",
+    "static/js/2.dac57b15.chunk.js.LICENSE.txt": "/carmen/static/js/2.dac57b15.chunk.js.LICENSE.txt",
+    "static/media/custom.scss": "/carmen/static/media/bootstrap-icons.0f69dcdb.woff"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.54ff20d2.js",
+    "static/css/2.b8bff687.chunk.css",
+    "static/js/2.dac57b15.chunk.js",
+    "static/css/main.a5530693.chunk.css",
+    "static/js/main.b4c4ccab.chunk.js"
+  ]
+}
