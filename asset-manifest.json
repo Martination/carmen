@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/carmen/static/css/main.a5530693.chunk.css",
-    "main.js": "/carmen/static/js/main.b4c4ccab.chunk.js",
-    "main.js.map": "/carmen/static/js/main.b4c4ccab.chunk.js.map",
+    "main.js": "/carmen/static/js/main.7b37694c.chunk.js",
+    "main.js.map": "/carmen/static/js/main.7b37694c.chunk.js.map",
     "runtime-main.js": "/carmen/static/js/runtime-main.54ff20d2.js",
     "runtime-main.js.map": "/carmen/static/js/runtime-main.54ff20d2.js.map",
     "static/css/2.b8bff687.chunk.css": "/carmen/static/css/2.b8bff687.chunk.css",
@@ -19,6 +19,6 @@
     "static/css/2.b8bff687.chunk.css",
     "static/js/2.dac57b15.chunk.js",
     "static/css/main.a5530693.chunk.css",
-    "static/js/main.b4c4ccab.chunk.js"
+    "static/js/main.7b37694c.chunk.js"
   ]
 }
