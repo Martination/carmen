@@ -3,6 +3,9 @@ import { Button } from 'bootstrap';
 import throttle from 'lodash/throttle';
 
 import FilterListItem from './FilterListItem'
+import image from './../WP.png'
+// import image from './../142.jpg'
+
 // import usePrevious from './usePrevious'
 const caman = window.Caman;
 
@@ -95,14 +98,6 @@ function createFilterList(filterList, onChange) {
 }
 
 
-// window.Caman.DEBUG = true
-let image = "WP.png";
-// let image = "142.jpg";
-let htmlCanvas = "#canvas"
-caman(htmlCanvas, image, function () {
-  this.render();
-});
-
 let isRendering = false;
 let prevRenderList = {}, curRenderList = {};
 let backlog = 0;
@@ -127,6 +122,11 @@ caman.Event.listen("processComplete", function (job) {
 
 
 const CamanCanvas = () => {
+  // window.Caman.DEBUG = true
+  let htmlCanvas = "#canvas"
+  caman(htmlCanvas, image, function () {
+    this.render();
+  });
   updateImgFn = updateImage;  // Save function so Caman Event listener can call it
 
   /* Update the image after our adjustments change */
