@@ -1,8 +1,8 @@
 {
   "name": "carmen",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
-  "homepage": "https://martination.github.io/carmen",
+  "homepage": ".",
   "dependencies": {
     "@testing-library/jest-dom": "^5.12.0",
     "@testing-library/react": "^11.2.6",

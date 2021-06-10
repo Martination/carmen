@@ -1,16 +1,18 @@
 $primary: #6f42c1;
-// $light: #e9ecef;
 $body-bg: #0e0e10;
-// $dark: #252525;
-// $body-color: #ccc;
 $mid-gray: #808080;
 
 @import "~bootstrap/scss/bootstrap.scss";
 @import "~bootstrap-icons/font/bootstrap-icons.css";
 
+.vertical-line {
+  white-space: pre-wrap;
+  border-left: 1px solid $mid-gray;
+  margin: 0 4px;
+}
+
 .edit-pane {
   background: $mid-gray;
-  // background: $gray-600;
 }
 
 #canvas {
@@ -36,13 +38,6 @@ $mid-gray: #808080;
 .btn:focus-within:not(.active):not(:hover) {
   background-color: $primary;
   border-color: $primary;
-}
-
-// Filler for now
-#filterHolder {
-  counter-reset: none;
-  // max-width: 100%;
-  // overflow-x: hidden;
 }
 
 #filterList label {

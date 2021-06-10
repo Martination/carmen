@@ -122,12 +122,12 @@ caman.Event.listen("processComplete", function (job) {
 
 
 const CamanCanvas = () => {
+  updateImgFn = updateImage;  // Save function so Caman Event listener can call it
   // window.Caman.DEBUG = true
   let htmlCanvas = "#canvas"
   caman(htmlCanvas, image, function () {
     this.render();
   });
-  updateImgFn = updateImage;  // Save function so Caman Event listener can call it
 
   /* Update the image after our adjustments change */
   const [presetList, setPresetList] = useState({});
@@ -235,9 +235,21 @@ const CamanCanvas = () => {
             {createFilterList(filterList, updateFilters)}
           </div>
 
-          <hr />
+          {/* <hr />
           <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 m-1">
             <CreatePresetList presetList={presetList} onClick={updatePresets} />
+          </div> */}
+
+          <hr />
+          <div className="py-2">
+            <button className="btn btn-primary" data-bs-target="#collapseTarget" data-bs-toggle="collapse">
+              vv Presets vv
+            </button>
+            <div className="collapse pt-2" id="collapseTarget">
+              <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 m-1">
+                <CreatePresetList presetList={presetList} onClick={updatePresets} />
+              </div>
+            </div>
           </div>
 
         </div>
