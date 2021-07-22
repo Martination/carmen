@@ -40,7 +40,7 @@ function PresetButton({ preset, presetName, onClick, active }) {
         onClick={(event) => { onClick(event) }} type="button">
         {`${presetName}`}
       </button>
-    </div >
+    </div>
   )
 }
 
@@ -121,18 +121,27 @@ caman.Event.listen("processComplete", function (job) {
 });
 
 
+let htmlCanvas = "#canvas";
+
 const CamanCanvas = () => {
   updateImgFn = updateImage;  // Save function so Caman Event listener can call it
   // window.Caman.DEBUG = true
-  let htmlCanvas = "#canvas"
-  caman(htmlCanvas, image, function () {
-    this.render();
-  });
+  // let htmlCanvas = "#canvas";
+  // caman(htmlCanvas, image, function () {
+  //   this.render();
+  // });
 
   /* Update the image after our adjustments change */
   const [presetList, setPresetList] = useState({});
   const [filterList, setFilterList] = useState({});
   const [adjustmentList, setAdjustmentList] = useState({});
+  const [presetToggle, setPresetToggle] = useState(false);
+  const [canvasSource, setCanvasSource] = useState(image);
+
+  function toggleCollapse() {
+    setPresetToggle(!presetToggle);
+  }
+
 
   // Throttled could take an options object, but it appears to work fine with default
   const throttled = useRef(throttle((adjustmentList) => (updateImage(adjustmentList)), 100));
@@ -221,11 +230,110 @@ const CamanCanvas = () => {
     });
   }
 
+  function EditPane() {
+    console.log("Edit pane")
+    return (
+      <div id="editPane" className="edit-pane bg-gray container-lg text-center p-4 lh-1">
+        <img alt="Editing Canvas" className="img-fluid d-none" id="canvas" src={image}></img>
+        <img id="testImg" className="img-fluid" src={canvasSource}></img>
+      </div>
+    )
+  }
+
+  let img = new Image();
+  // let fileName = "";
+  function uploadFile(event) {
+    const file = event.target.files[0];
+    console.log(file);
+
+    const reader = new FileReader();
+    if (file) {
+      // fileName = file.name;
+      // read data as URL
+      reader.readAsDataURL(file);
+    }
+
+    // console.log(reader);
+
+    // add image to canvas
+    // const canvas = document.getElementById("testCanvas");
+    // const ctx = canvas.getContext("2d");
+
+    // const editPane = document.getElementById("editPane");
+    // let testImage = React.createElement("img");
+    // let testImage = <img id="testImage" />
+
+
+
+    // const testImage = document.getElementById("testImg");
+    // console.log(testImage);
+
+    // let imageParent = testImage.parentElement;
+    // imageParent.removeChild(testImage);
+
+
+    reader.onload = () => {
+      img = new Image();
+      img.src = reader.result;
+
+      // testImage.src = reader.result;
+
+      setCanvasSource(reader.result);
+
+      // img.onload = () => {
+      //   canvas.width = img.width;
+      //   canvas.height = img.height;
+      //   ctx.drawImage(img, 0, 0, img.width, img.height);
+      //   // canvas.removeAttribute("data-caman-id");
+      // };
+    };
+
+    htmlCanvas = "#testImg";
+    caman(htmlCanvas, function () {
+      this.render();
+    });
+    console.log(htmlCanvas);
+
+
+
+    // reader.addEventListener("load", () => {
+    //   img = new Image();
+    //   img.src = reader.result;
+    //   img.onload = function () {
+    //     canvas.width = img.width;
+    //     canvas.height = img.height;
+    //     ctx.drawImage(img, 0, 0, img.width, img.height);
+    //     canvas.removeAttribute("data-caman-id");
+    //   };
+    // },
+    //   false
+    // );
+  }
+
+  // console.log(htmlCanvas);
 
   return (
     <>
-      <div className="edit-pane bg-gray container-lg text-center p-4 lh-1">
+      {/* <div id="editPane" className="edit-pane bg-gray container-lg text-center p-4 lh-1">
         <img alt="Editing Canvas" className="img-fluid" id="canvas" src={image}></img>
+        <canvas id="testCanvas"></canvas>
+        <img id="testImg"></img>
+      </div> */}
+
+      <EditPane />
+
+      <div className="row my-3">
+        <div className="col">
+          {/* <label htmlFor="formFile" className="form-label">Upload Image</label> */}
+          <input className="form-control" type="file" id="formFile" onChange={uploadFile}></input>
+        </div>
+        <div className="col col-auto text-center">
+          {/* <label htmlFor="downloadImage"></label> */}
+          <button id="downloadImage" className="btn btn-primary">
+            <i className="d-block d-md-none bi bi-download"></i>
+            <span className="d-none d-md-block">Download Image</span>
+          </button>
+        </div>
       </div>
 
       <div id="filterHolder">
@@ -235,15 +343,12 @@ const CamanCanvas = () => {
             {createFilterList(filterList, updateFilters)}
           </div>
 
-          {/* <hr />
-          <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 m-1">
-            <CreatePresetList presetList={presetList} onClick={updatePresets} />
-          </div> */}
-
           <hr />
           <div className="py-2">
-            <button className="btn btn-primary" data-bs-target="#collapseTarget" data-bs-toggle="collapse">
-              vv Presets vv
+            <button className="btn btn-primary" onClick={toggleCollapse} data-bs-target="#collapseTarget" data-bs-toggle="collapse">
+              <i className={"px-2 bi " + (presetToggle ? "bi-chevron-compact-up" : "bi-chevron-compact-down")}></i>
+              Presets
+              <i className={"px-2 bi " + (presetToggle ? "bi-chevron-compact-up" : "bi-chevron-compact-down")}></i>
             </button>
             <div className="collapse pt-2" id="collapseTarget">
               <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 m-1">
