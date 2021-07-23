@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+// import ReactDOM from 'react-dom';
 import { Button } from 'bootstrap';
 import throttle from 'lodash/throttle';
 
@@ -121,22 +122,35 @@ caman.Event.listen("processComplete", function (job) {
 });
 
 
-let htmlCanvas = "#canvas";
+// let htmlCanvas = "#canvas";
+// caman(htmlCanvas, image, function () {
+//   this.render();
+// });
 
 const CamanCanvas = () => {
-  updateImgFn = updateImage;  // Save function so Caman Event listener can call it
-  // window.Caman.DEBUG = true
-  // let htmlCanvas = "#canvas";
-  // caman(htmlCanvas, image, function () {
-  //   this.render();
-  // });
-
-  /* Update the image after our adjustments change */
   const [presetList, setPresetList] = useState({});
   const [filterList, setFilterList] = useState({});
   const [adjustmentList, setAdjustmentList] = useState({});
   const [presetToggle, setPresetToggle] = useState(false);
-  const [canvasSource, setCanvasSource] = useState(image);
+  // const [canvasSource, setCanvasSource] = useState(image);
+  // const canvasRef = useRef(null);
+  const editPaneRef = useRef(null);
+
+  updateImgFn = updateImage;  // Save function so Caman Event listener can call it
+  // window.Caman.DEBUG = true
+  let htmlCanvas = "#canvas";
+  caman(htmlCanvas, image, function () {
+    this.render();
+  });
+
+
+
+  // caman("#testCanvas", canvasSource, function () {
+  //   this.render();
+  // });
+
+  /* Update the image after our adjustments change */
+
 
   function toggleCollapse() {
     setPresetToggle(!presetToggle);
@@ -230,21 +244,46 @@ const CamanCanvas = () => {
     });
   }
 
-  function EditPane() {
-    console.log("Edit pane")
-    return (
-      <div id="editPane" className="edit-pane bg-gray container-lg text-center p-4 lh-1">
-        <img alt="Editing Canvas" className="img-fluid d-none" id="canvas" src={image}></img>
-        <img id="testImg" className="img-fluid" src={canvasSource}></img>
-      </div>
-    )
-  }
+  // function EditPane() {
+  //   console.log("Edit pane", canvasSource);
 
-  let img = new Image();
+  //   // const canvasRef = useRef(null);
+  //   // const canvasEl = canvasRef.current;
+  //   // const context = canvasEl.getContext("2d");
+
+  //   let canvas = <canvas id="canvas" className="img-fluid" />
+  //   // let ctx = canvas.getContext("2d");
+  //   // console.log(ctx);
+  //   return (
+  //     <div id="editPane" className="edit-pane bg-gray container-lg text-center p-4 lh-1">
+  //       <img alt="Editing Canvas" className="img-fluid" id="canvas" src={image}></img>
+  //       {/* {canvas} */}
+  //     </div>
+  //   )
+  // }
+
+  // useEffect(() => {
+  //   console.log("Effecting")
+  //   caman(htmlCanvas, canvasSource, function () {
+  //     this.render();
+  //   });
+  // }, [canvasSource]);
+
+
+  // let img = new Image();
   // let fileName = "";
   function uploadFile(event) {
+
     const file = event.target.files[0];
-    console.log(file);
+    console.log(file, event.target.id);
+
+    let parent = editPaneRef.current;
+    let canvas = parent.firstChild;
+    let context = canvas.getContext("2d");
+
+    console.log(parent.firstChild);
+    // console.log(parent.firstChild.getContext("2d"));
+
 
     const reader = new FileReader();
     if (file) {
@@ -253,77 +292,75 @@ const CamanCanvas = () => {
       reader.readAsDataURL(file);
     }
 
-    // console.log(reader);
-
-    // add image to canvas
-    // const canvas = document.getElementById("testCanvas");
-    // const ctx = canvas.getContext("2d");
-
-    // const editPane = document.getElementById("editPane");
-    // let testImage = React.createElement("img");
-    // let testImage = <img id="testImage" />
-
-
-
-    // const testImage = document.getElementById("testImg");
-    // console.log(testImage);
-
-    // let imageParent = testImage.parentElement;
-    // imageParent.removeChild(testImage);
-
+    // const canvasEl = canvasRef.current;
+    // const context = canvasEl.getContext("2d");
+    // console.log(canvasEl);
 
     reader.onload = () => {
-      img = new Image();
+      let img = new Image();
       img.src = reader.result;
 
-      // testImage.src = reader.result;
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        context.drawImage(img, 0, 0, img.width, img.height);
+        canvas.removeAttribute("data-caman-id");
 
-      setCanvasSource(reader.result);
+        updateImage(adjustmentList);
 
-      // img.onload = () => {
-      //   canvas.width = img.width;
-      //   canvas.height = img.height;
-      //   ctx.drawImage(img, 0, 0, img.width, img.height);
-      //   // canvas.removeAttribute("data-caman-id");
-      // };
+        //   caman(canvas, function () {
+        //     this.render();
+        //   });
+      };
+
+      // setCanvasSource(reader.result);
+
     };
 
-    htmlCanvas = "#testImg";
-    caman(htmlCanvas, function () {
-      this.render();
-    });
-    console.log(htmlCanvas);
 
 
 
-    // reader.addEventListener("load", () => {
-    //   img = new Image();
-    //   img.src = reader.result;
-    //   img.onload = function () {
-    //     canvas.width = img.width;
-    //     canvas.height = img.height;
-    //     ctx.drawImage(img, 0, 0, img.width, img.height);
-    //     canvas.removeAttribute("data-caman-id");
-    //   };
-    // },
-    //   false
-    // );
+    // let testCanvas = document.getElementById("testCanvas");
+    // let parent = testCanvas.parentElement;
+
+    // let newCanvas = <img id="newCanvas" className="img-fluid" src={reader.result} />
+
+    // let newCanvas = React.createElement("img", { id: "newCanvas", className: "img-fluid", src: reader.result })
+
+    // parent.appendChild(newCanvas);
+
+    // ReactDOM.createPortal(newCanvas, parent);
+
+    // caman(newCanvas, function () {
+    //   this.render();
+    // })
+
+    // htmlCanvas = "#testImg";
+    // console.log("Rendering with new image?")
+    // caman("#testCanvas", reader.result, function () {
+    //   this.render();
+    // });
+
+    // updateImage(adjustmentList);
+    // console.log(htmlCanvas);
   }
 
-  // console.log(htmlCanvas);
+  // console.log(canvasRef);
 
   return (
     <>
-      {/* <div id="editPane" className="edit-pane bg-gray container-lg text-center p-4 lh-1">
-        <img alt="Editing Canvas" className="img-fluid" id="canvas" src={image}></img>
-        <canvas id="testCanvas"></canvas>
-        <img id="testImg"></img>
-      </div> */}
+      <div id="editPane" ref={editPaneRef} className="edit-pane bg-gray container-lg text-center p-4 lh-1">
+        <img id="canvas" alt="Editing Canvas" className="img-fluid" src={image} />
+        {/* <img id="testCanvas" ref={canvasRef} className="img-fluid" src={image} /> */}
+        {/* <img id="testImg" /> */}
+      </div>
 
-      <EditPane />
+      {/* <EditPane /> */}
+
+      {/* <canvas id="canvas2" className="img-fluid" src={canvasSource} /> */}
 
       <div className="row my-3">
-        <div className="col">
+        <div className="col pe-0">
           {/* <label htmlFor="formFile" className="form-label">Upload Image</label> */}
           <input className="form-control" type="file" id="formFile" onChange={uploadFile}></input>
         </div>
