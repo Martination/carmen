@@ -132,6 +132,7 @@ const CamanCanvas = () => {
   const [filterList, setFilterList] = useState({});
   const [adjustmentList, setAdjustmentList] = useState({});
   const [presetToggle, setPresetToggle] = useState(false);
+  const [filename, setFilename] = useState("");
   // const [canvasSource, setCanvasSource] = useState(image);
   // const canvasRef = useRef(null);
   const editPaneRef = useRef(null);
@@ -275,19 +276,20 @@ const CamanCanvas = () => {
   function uploadFile(event) {
 
     const file = event.target.files[0];
-    console.log(file, event.target.id);
+    // console.log(file, event.target.id);
 
     let parent = editPaneRef.current;
     let canvas = parent.firstChild;
     let context = canvas.getContext("2d");
 
-    console.log(parent.firstChild);
+    // console.log(parent.firstChild);
     // console.log(parent.firstChild.getContext("2d"));
 
 
     const reader = new FileReader();
     if (file) {
       // fileName = file.name;
+      setFilename(file.name);
       // read data as URL
       reader.readAsDataURL(file);
     }
@@ -317,9 +319,6 @@ const CamanCanvas = () => {
 
     };
 
-
-
-
     // let testCanvas = document.getElementById("testCanvas");
     // let parent = testCanvas.parentElement;
 
@@ -345,6 +344,22 @@ const CamanCanvas = () => {
     // console.log(htmlCanvas);
   }
 
+  function downloadImage(event) {
+
+    let newFilename = filename ? ("carmen-edited-" + filename) : "carmen-edited.jpg"
+    console.log("Boop! Downloading", newFilename);
+
+    let parent = editPaneRef.current;
+    let canvas = parent.firstChild;
+
+    // create link
+    const link = document.createElement("a");
+    link.download = newFilename;
+    link.href = canvas.toDataURL("image/jpeg", 1);
+    let e = new MouseEvent("click");
+    link.dispatchEvent(e);
+  }
+
   // console.log(canvasRef);
 
   return (
@@ -366,7 +381,7 @@ const CamanCanvas = () => {
         </div>
         <div className="col col-auto text-center">
           {/* <label htmlFor="downloadImage"></label> */}
-          <button id="downloadImage" className="btn btn-primary">
+          <button id="downloadImage" className="btn btn-primary" onClick={downloadImage}>
             <i className="d-block d-md-none bi bi-download"></i>
             <span className="d-none d-md-block">Download Image</span>
           </button>
