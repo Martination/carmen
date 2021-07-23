@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-// import ReactDOM from 'react-dom';
 import { Button } from 'bootstrap';
 import throttle from 'lodash/throttle';
 
@@ -122,10 +121,11 @@ caman.Event.listen("processComplete", function (job) {
 });
 
 
-// let htmlCanvas = "#canvas";
-// caman(htmlCanvas, image, function () {
-//   this.render();
-// });
+// window.Caman.DEBUG = true
+let htmlCanvas = "#canvas";
+caman(htmlCanvas, image, function () {
+  this.render();
+});
 
 const CamanCanvas = () => {
   const [presetList, setPresetList] = useState({});
@@ -133,34 +133,16 @@ const CamanCanvas = () => {
   const [adjustmentList, setAdjustmentList] = useState({});
   const [presetToggle, setPresetToggle] = useState(false);
   const [filename, setFilename] = useState("");
-  // const [canvasSource, setCanvasSource] = useState(image);
-  // const canvasRef = useRef(null);
   const editPaneRef = useRef(null);
 
   updateImgFn = updateImage;  // Save function so Caman Event listener can call it
-  // window.Caman.DEBUG = true
-  let htmlCanvas = "#canvas";
-  caman(htmlCanvas, image, function () {
-    this.render();
-  });
-
-
-
-  // caman("#testCanvas", canvasSource, function () {
-  //   this.render();
-  // });
-
-  /* Update the image after our adjustments change */
-
-
-  function toggleCollapse() {
-    setPresetToggle(!presetToggle);
-  }
 
 
   // Throttled could take an options object, but it appears to work fine with default
   const throttled = useRef(throttle((adjustmentList) => (updateImage(adjustmentList)), 100));
   // const prevList = usePrevious(adjustmentList);
+
+  /* Update the image after our adjustments change */
   useEffect(() => {
     // if (JSON.stringify(prevList) !== JSON.stringify(adjustmentList)) {
     if (JSON.stringify(prevRenderList) !== JSON.stringify(adjustmentList)) {
@@ -245,34 +227,13 @@ const CamanCanvas = () => {
     });
   }
 
-  // function EditPane() {
-  //   console.log("Edit pane", canvasSource);
 
-  //   // const canvasRef = useRef(null);
-  //   // const canvasEl = canvasRef.current;
-  //   // const context = canvasEl.getContext("2d");
-
-  //   let canvas = <canvas id="canvas" className="img-fluid" />
-  //   // let ctx = canvas.getContext("2d");
-  //   // console.log(ctx);
-  //   return (
-  //     <div id="editPane" className="edit-pane bg-gray container-lg text-center p-4 lh-1">
-  //       <img alt="Editing Canvas" className="img-fluid" id="canvas" src={image}></img>
-  //       {/* {canvas} */}
-  //     </div>
-  //   )
-  // }
-
-  // useEffect(() => {
-  //   console.log("Effecting")
-  //   caman(htmlCanvas, canvasSource, function () {
-  //     this.render();
-  //   });
-  // }, [canvasSource]);
+  /* Presets toggle button */
+  function toggleCollapse() {
+    setPresetToggle(!presetToggle);
+  }
 
 
-  // let img = new Image();
-  // let fileName = "";
   function uploadFile(event) {
 
     const file = event.target.files[0];
@@ -282,21 +243,12 @@ const CamanCanvas = () => {
     let canvas = parent.firstChild;
     let context = canvas.getContext("2d");
 
-    // console.log(parent.firstChild);
-    // console.log(parent.firstChild.getContext("2d"));
-
-
     const reader = new FileReader();
     if (file) {
-      // fileName = file.name;
       setFilename(file.name);
       // read data as URL
       reader.readAsDataURL(file);
     }
-
-    // const canvasEl = canvasRef.current;
-    // const context = canvasEl.getContext("2d");
-    // console.log(canvasEl);
 
     reader.onload = () => {
       let img = new Image();
@@ -314,39 +266,13 @@ const CamanCanvas = () => {
         //     this.render();
         //   });
       };
-
-      // setCanvasSource(reader.result);
-
     };
 
-    // let testCanvas = document.getElementById("testCanvas");
-    // let parent = testCanvas.parentElement;
-
-    // let newCanvas = <img id="newCanvas" className="img-fluid" src={reader.result} />
-
-    // let newCanvas = React.createElement("img", { id: "newCanvas", className: "img-fluid", src: reader.result })
-
-    // parent.appendChild(newCanvas);
-
-    // ReactDOM.createPortal(newCanvas, parent);
-
-    // caman(newCanvas, function () {
-    //   this.render();
-    // })
-
-    // htmlCanvas = "#testImg";
-    // console.log("Rendering with new image?")
-    // caman("#testCanvas", reader.result, function () {
-    //   this.render();
-    // });
-
-    // updateImage(adjustmentList);
-    // console.log(htmlCanvas);
   }
 
   function downloadImage(event) {
 
-    let newFilename = filename ? ("carmen-edited-" + filename) : "carmen-edited.jpg"
+    let newFilename = filename ? ("carmen-edited_" + filename) : "carmen-edited.jpg"
     console.log("Boop! Downloading", newFilename);
 
     let parent = editPaneRef.current;
@@ -360,19 +286,12 @@ const CamanCanvas = () => {
     link.dispatchEvent(e);
   }
 
-  // console.log(canvasRef);
 
   return (
     <>
       <div id="editPane" ref={editPaneRef} className="edit-pane bg-gray container-lg text-center p-4 lh-1">
         <img id="canvas" alt="Editing Canvas" className="img-fluid" src={image} />
-        {/* <img id="testCanvas" ref={canvasRef} className="img-fluid" src={image} /> */}
-        {/* <img id="testImg" /> */}
       </div>
-
-      {/* <EditPane /> */}
-
-      {/* <canvas id="canvas2" className="img-fluid" src={canvasSource} /> */}
 
       <div className="row my-3">
         <div className="col pe-0">
