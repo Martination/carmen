@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import https from 'follow-redirects/https';
 // const fs = require('fs');
 
@@ -30,7 +29,6 @@ function httpsRequest(params, postData) {
 
     // reject on request error
     req.on('error', function (err) {
-      // This is not a "Second reject", just a different sort of failure
       reject(err);
     });
 
@@ -42,11 +40,14 @@ function httpsRequest(params, postData) {
   });
 }
 
-export async function getImgBlob(imageUrl) {
-  let response = await fetch(imageUrl);
-  let data = await response.blob();
+export async function getImgBlob(imageUrl, imgId) {
+  if (imageUrl) {
+    let response = await fetch(imageUrl);
+    let data = await response.blob();
+    data.name = imgId;
 
-  return data;
+    return data;
+  }
 }
 
 export function getImg(imageId, setImgData) {
@@ -62,10 +63,7 @@ export function getImg(imageId, setImgData) {
   };
 
   httpsRequest(options)
-    .then((results) => {
-      console.log(results);
-      setImgData(results.data);
-    })
+    .then((results) => (setImgData(results.data)))
     .catch((err) => console.error(err));
 }
 
@@ -82,39 +80,6 @@ export function getAlbum(albumId) {
   };
 
   return httpsRequest(options)
-    .then((results) => {
-      console.log(results);
-      console.log(results.data.images[0].link)
-      return results.data.images[0].id;
-    })
+    .then((results) => { return results.data.images[0].id; })
     .catch((err) => console.error(err));
 }
-
-const GetImgurImg = () => {
-
-  const [imgData, setImgData] = useState({});
-
-  function downloadImage() {
-
-    let imageId = "Bz2WPZT";   // jpg
-    // let imageId = "CVYlM4R";   // album
-
-    // getImg(imageId, setImgData);
-
-    setImgData({ link: "https://i.imgur.com/Bz2WPZT.jpg", id: "Bz2WPZT", description: "This is an 1x1" });
-  }
-
-  // Used to only call it once, not repeatedly
-  useEffect(() => {
-    downloadImage();
-  }, []);
-
-  return (
-    <div className="col">
-      This is the Imgur Downloader. ID: {imgData.id} Desc: {imgData.description}
-      <img alt={imgData.title} src={imgData.link}></img>
-    </div>
-  );
-};
-
-export default GetImgurImg;

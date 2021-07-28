@@ -236,6 +236,7 @@ const CamanCanvas = () => {
     setPresetToggle(!presetToggle);
   }
 
+  /* Take an image object and update the canvas */
   function updateCanvas(img) {
     let parent = editPaneRef.current;
     let canvas = parent.firstChild;
@@ -249,6 +250,7 @@ const CamanCanvas = () => {
     updateImage(adjustmentList);
   }
 
+  /* Read a file and upate the canvas */
   function setImage(file) {
     const reader = new FileReader();
     if (file) {
@@ -265,9 +267,10 @@ const CamanCanvas = () => {
     };
   }
 
+
+  /* Take the file from the file browser and set it */
   function uploadFile(event) {
     const file = event.target.files[0];
-    // console.log(file, event.target.id);
     setImage(file);
   }
 
@@ -291,13 +294,7 @@ const CamanCanvas = () => {
 
   async function importImgur() {
     let form = imgurUrlRef.current;
-    console.log("Import", form.value)
     let value = form.value;
-
-    // const exampleUrl = "https://imgur.com/Bz2WPZT"
-    // const exampleUrl2 = "https://i.imgur.com/Bz2WPZT.jpg"
-    // const exampleUrl3 = 'https://imgur.com/a/3AMDPNA'
-    // const exampleUrl4 = 'https://imgur.com/gallery/3AMDPNA'
 
     // imageID is 7 chars long
     const regex = /\w{7}/g
@@ -306,16 +303,17 @@ const CamanCanvas = () => {
     let imgId;
     if (album.test(value)) {
       imgId = value.split(album)[1];
-      console.log(imgId);
+      imgId = imgId.substring(0, 7)  // In case anything is after the id
 
       // Do album look up to get real cover imgId
       imgId = await getAlbum(imgId);
       console.log(imgId);
 
-    } else {
+    } else if (regex.test(value)) {
       imgId = value.match(regex)[0];
       console.log(imgId);
-    }
+
+    } else { return; }
 
     // Get imgId URL and update canvas
     try {
@@ -327,10 +325,10 @@ const CamanCanvas = () => {
   }
 
   useEffect(() => {
-    getImgBlob(imgurImgData.link)
+    getImgBlob(imgurImgData.link, imgurImgData.id)
       .then(result => setImage(result))
       .catch((err) => console.error(err));
-  }, [imgurImgData]);
+  }, [imgurImgData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function exportImgur() {
     console.log("Export")
@@ -345,7 +343,8 @@ const CamanCanvas = () => {
       <div className="row my-3 d-flex align-items-end">
         <div className="col">
           <label htmlFor="formImgur" className="form-label">Import Image from or Upload to Imgur</label>
-          <input className="form-control" id="formImgur" ref={imgurUrlRef} type="text" placeholder="https://imgur.com/..." aria-labelledby="formImgur" required />
+          <input className="form-control" id="formImgur" ref={imgurUrlRef} type="text"
+            placeholder="https://imgur.com/..." aria-labelledby="formImgur" required />
         </div>
         <div className="col col-auto text-center ps-0">
           <button id="downloadImage" className="btn btn-primary" type="submit" onClick={importImgur}>
@@ -364,7 +363,8 @@ const CamanCanvas = () => {
       <div className="row my-3 d-flex align-items-end">
         <div className="col">
           <label htmlFor="formFile" className="form-label">Upload Image from Device</label>
-          <input className="form-control" type="file" id="formFile" accept="image/*" aria-labelledby="formFile" onChange={uploadFile} />
+          <input className="form-control" type="file" id="formFile" accept="image/*"
+            aria-labelledby="formFile" onChange={uploadFile} />
         </div>
         <div className="col col-auto text-center ps-0">
           <button id="downloadImage" className="btn btn-primary" onClick={downloadImage}>
