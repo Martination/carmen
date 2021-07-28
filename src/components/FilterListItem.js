@@ -15,7 +15,7 @@ const FilterListItem = ({ filter, range, filterList, onChange }) => {
     <div className="col">
       <div className="row gx-1 hover">
 
-        <label name={filter} className="col-3"
+        <label name={filter} className="col-3 reset"
           onClick={(event) => resetValue(event, init, onChange)}>{filter}</label>
 
         <div className="col-8">
@@ -24,7 +24,7 @@ const FilterListItem = ({ filter, range, filterList, onChange }) => {
             value={curValue} onChange={(event) => onChange(event, init)} />
         </div>
 
-        <span name={filter} className="col-1"
+        <span name={filter} className="col-1 reset"
           onClick={(event) => resetValue(event, init, onChange)}>{curValue}</span>
 
       </div>

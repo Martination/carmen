@@ -30,6 +30,18 @@ $mid-gray: #808080;
   opacity: 1;
 }
 
+.reset {
+  background-color: #212529;
+  transition: background-color 0.2s;
+  -webkit-transition: background-color 0.2s;
+}
+
+.reset:hover {
+  background-color: #6c757d;
+  transition: background-color 0.2s;
+  -webkit-transition: background-color 0.2s;
+}
+
 .btn:focus:not(:focus-visible) {
   box-shadow: none;
 }

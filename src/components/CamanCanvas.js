@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from 'bootstrap';
 import throttle from 'lodash/throttle';
 
+import { getImg, getImgBlob, getAlbum } from './GetImgurImg'
 import FilterListItem from './FilterListItem'
 import image from './../WP.png'
 // import image from './../142.jpg'
@@ -133,7 +134,9 @@ const CamanCanvas = () => {
   const [adjustmentList, setAdjustmentList] = useState({});
   const [presetToggle, setPresetToggle] = useState(false);
   const [filename, setFilename] = useState("");
+  const [imgurImgData, setImgurImgData] = useState({});
   const editPaneRef = useRef(null);
+  const imgurUrlRef = useRef(null);
 
   updateImgFn = updateImage;  // Save function so Caman Event listener can call it
 
@@ -177,7 +180,7 @@ const CamanCanvas = () => {
 
     let newList;
     if (value === init) {
-      console.log(`Reset ${filter} to default`)
+      // console.log(`Reset ${filter} to default`)
       newList = { ...filterList };
       delete newList[filter];
     } else {
@@ -233,16 +236,20 @@ const CamanCanvas = () => {
     setPresetToggle(!presetToggle);
   }
 
-
-  function uploadFile(event) {
-
-    const file = event.target.files[0];
-    // console.log(file, event.target.id);
-
+  function updateCanvas(img) {
     let parent = editPaneRef.current;
     let canvas = parent.firstChild;
     let context = canvas.getContext("2d");
 
+    canvas.width = img.width;
+    canvas.height = img.height;
+    context.drawImage(img, 0, 0, img.width, img.height);
+    canvas.removeAttribute("data-caman-id");
+
+    updateImage(adjustmentList);
+  }
+
+  function setImage(file) {
     const reader = new FileReader();
     if (file) {
       setFilename(file.name);
@@ -254,23 +261,18 @@ const CamanCanvas = () => {
       let img = new Image();
       img.src = reader.result;
 
-      img.onload = () => {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        context.drawImage(img, 0, 0, img.width, img.height);
-        canvas.removeAttribute("data-caman-id");
-
-        updateImage(adjustmentList);
-
-        //   caman(canvas, function () {
-        //     this.render();
-        //   });
-      };
+      img.onload = () => { updateCanvas(img); };
     };
-
   }
 
-  function downloadImage(event) {
+  function uploadFile(event) {
+    const file = event.target.files[0];
+    // console.log(file, event.target.id);
+    setImage(file);
+  }
+
+
+  function downloadImage() {
 
     let newFilename = filename ? ("carmen-edited_" + filename) : "carmen-edited.jpg"
     console.log("Boop! Downloading", newFilename);
@@ -287,21 +289,86 @@ const CamanCanvas = () => {
   }
 
 
+  async function importImgur() {
+    let form = imgurUrlRef.current;
+    console.log("Import", form.value)
+    let value = form.value;
+
+    // const exampleUrl = "https://imgur.com/Bz2WPZT"
+    // const exampleUrl2 = "https://i.imgur.com/Bz2WPZT.jpg"
+    // const exampleUrl3 = 'https://imgur.com/a/3AMDPNA'
+    // const exampleUrl4 = 'https://imgur.com/gallery/3AMDPNA'
+
+    // imageID is 7 chars long
+    const regex = /\w{7}/g
+    const album = /\/gallery\/|\/a\//g
+
+    let imgId;
+    if (album.test(value)) {
+      imgId = value.split(album)[1];
+      console.log(imgId);
+
+      // Do album look up to get real cover imgId
+      imgId = await getAlbum(imgId);
+      console.log(imgId);
+
+    } else {
+      imgId = value.match(regex)[0];
+      console.log(imgId);
+    }
+
+    // Get imgId URL and update canvas
+    try {
+      getImg(imgId, setImgurImgData);
+    } catch (error) {
+      console.error(error);
+    }
+
+  }
+
+  useEffect(() => {
+    getImgBlob(imgurImgData.link)
+      .then(result => setImage(result))
+      .catch((err) => console.error(err));
+  }, [imgurImgData]);
+
+  function exportImgur() {
+    console.log("Export")
+  }
+
   return (
     <>
       <div id="editPane" ref={editPaneRef} className="edit-pane bg-gray container-lg text-center p-4 lh-1">
         <img id="canvas" alt="Editing Canvas" className="img-fluid" src={image} />
       </div>
 
-      <div className="row my-3">
-        <div className="col pe-0">
-          {/* <label htmlFor="formFile" className="form-label">Upload Image</label> */}
-          <input className="form-control" type="file" id="formFile" onChange={uploadFile}></input>
+      <div className="row my-3 d-flex align-items-end">
+        <div className="col">
+          <label htmlFor="formImgur" className="form-label">Import Image from or Upload to Imgur</label>
+          <input className="form-control" id="formImgur" ref={imgurUrlRef} type="text" placeholder="https://imgur.com/..." aria-labelledby="formImgur" required />
         </div>
-        <div className="col col-auto text-center">
-          {/* <label htmlFor="downloadImage"></label> */}
+        <div className="col col-auto text-center ps-0">
+          <button id="downloadImage" className="btn btn-primary" type="submit" onClick={importImgur}>
+            <i className="d-block d-md-none bi bi-cloud-download" />
+            <span className="d-none d-md-block">Import from Imgur</span>
+          </button>
+        </div>
+        <div className="col col-auto text-center ps-0">
+          <button id="downloadImage" className="btn btn-primary" onClick={exportImgur}>
+            <i className="d-block d-md-none bi bi-cloud-upload" />
+            <span className="d-none d-md-block">Upload to Imgur</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="row my-3 d-flex align-items-end">
+        <div className="col">
+          <label htmlFor="formFile" className="form-label">Upload Image from Device</label>
+          <input className="form-control" type="file" id="formFile" accept="image/*" aria-labelledby="formFile" onChange={uploadFile} />
+        </div>
+        <div className="col col-auto text-center ps-0">
           <button id="downloadImage" className="btn btn-primary" onClick={downloadImage}>
-            <i className="d-block d-md-none bi bi-download"></i>
+            <i className="d-block d-md-none bi bi-download" />
             <span className="d-none d-md-block">Download Image</span>
           </button>
         </div>
