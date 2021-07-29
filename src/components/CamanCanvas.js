@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from 'bootstrap';
 import throttle from 'lodash/throttle';
 
-import { getImg, getImgBlob, getAlbum } from './GetImgurImg'
+import { getImg, getImgBlob, getAlbum } from './ImgurAPI'
 import FilterListItem from './FilterListItem'
 import image from './../WP.png'
 // import image from './../142.jpg'

@@ -50,6 +50,8 @@ export async function getImgBlob(imageUrl, imgId) {
   }
 }
 
+
+
 export function getImg(imageId, setImgData) {
 
   const options = {
