@@ -1,6 +1,8 @@
 $primary: #6f42c1;
 $body-bg: #0e0e10;
 $mid-gray: #808080;
+$form-range-track-bg: #a5a9ad;
+$form-range-track-hover: #DEE2E6;
 
 @import "~bootstrap/scss/bootstrap.scss";
 @import "~bootstrap-icons/font/bootstrap-icons.css";
@@ -20,18 +22,40 @@ $mid-gray: #808080;
 }
 
 .slider {
-  opacity: 0.7;
-  transition: 0.2s;
-  -webkit-transition: opacity 0.2s;
   cursor: pointer;
 }
 
-.hover:hover .slider {
-  opacity: 1;
+// I'm sorry this is crazy...
+// On hover of each row, select the 1st div's 1st child (input range)
+// And change the color of the range track
+.hover:hover div:nth-of-type(1) :first-child::-moz-range-track {
+  background-color: $form-range-track-hover;
 }
+
+.hover:hover div:nth-of-type(1) :first-child::-webkit-slider-runnable-track {
+  background-color: $form-range-track-hover;
+}
+
+.hover:hover div:nth-of-type(1) :first-child::-ms-track {
+  background-color: $form-range-track-hover;
+}
+
+.slider::-moz-range-track {
+  transition: background-color 0.2s;
+}
+
+.slider::-webkit-slider-runnable-track {
+  transition: background-color 0.2s;
+}
+
+.slider::-ms-track {
+  transition: background-color 0.2s;
+}
+
 
 .reset {
   background-color: #212529;
+  cursor: default;
   transition: background-color 0.2s;
   -webkit-transition: background-color 0.2s;
 }
@@ -47,7 +71,7 @@ $mid-gray: #808080;
 }
 
 // Visually set inactive but focused presets to default
-.btn:focus-within:not(.active):not(:hover) {
+.preset.btn:focus-within:not(.active):not(:hover) {
   background-color: $primary;
   border-color: $primary;
 }

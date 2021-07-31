@@ -1,44 +1,5 @@
-import https from 'follow-redirects/https';
+// import https from 'follow-redirects/https';
 // const fs = require('fs');
-
-function httpsRequest(params, postData) {
-  return new Promise(function (resolve, reject) {
-    const req = https.request(params, function (res) {
-
-      // reject on bad status
-      if (res.statusCode < 200 || res.statusCode >= 300) {
-        return reject(new Error('Status Code ' + res.statusCode));
-      }
-
-      // cumulate data
-      var body = [];
-      res.on('data', function (chunk) {
-        body.push(chunk);
-      });
-
-      // resolve on end
-      res.on('end', function () {
-        try {
-          body = JSON.parse(Buffer.concat(body).toString());
-        } catch (err) {
-          reject(err);
-        }
-        resolve(body);
-      });
-    });
-
-    // reject on request error
-    req.on('error', function (err) {
-      reject(err);
-    });
-
-    if (postData) {
-      req.write(postData);
-    }
-
-    req.end();
-  });
-}
 
 export async function getImgBlob(imageUrl, imgId) {
   if (imageUrl) {
@@ -49,7 +10,6 @@ export async function getImgBlob(imageUrl, imgId) {
     return data;
   }
 }
-
 
 // https://imgur.com/h961kWg
 // https://imgur.com/a/3AMDPNA
@@ -66,15 +26,17 @@ export function getImg(imageId, setImgData) {
     'maxRedirects': 20,
   };
 
-  fetch(url, options)
+  return fetch(url, options)
     .then((res) => res.json())
-    .then((data) => { console.log(data); setImgData(data.data) })
-    .catch((err) => console.error(err));
+    .then((data) => {
+      const mime = /image/
 
+      if (!mime.test(data.data.type)) {
+        throw new Error(`Unsupported Filetype: ${data.data.type}`);
+      }
 
-  // httpsRequest(options)
-  //   .then((results) => (setImgData(results.data)))
-  //   .catch((err) => console.error(err));
+      setImgData(data.data);
+    });
 }
 
 export function getAlbum(albumId) {
@@ -93,28 +55,13 @@ export function getAlbum(albumId) {
     .then((res) => res.json())
     .then((data) => { return data.data.images[0].id; })
     .catch((err) => console.error(err));
-
-
-  // const options = {
-  //   'method': 'GET',
-  //   'hostname': 'api.imgur.com',
-  //   'path': `/3/album/${albumId}`,
-  //   'headers': {
-  //     'Authorization': `Client-ID ${process.env.REACT_APP_CLIENTID}`
-  //   },
-  //   'maxRedirects': 20
-  // };
-
-  // return httpsRequest(options)
-  //   .then((results) => { return results.data.images[0].id; })
-  //   .catch((err) => console.error(err));
 }
 
 
 export function uploadImg(img, callback) {
-  img.data = img.data.toString().replace(/data:.+?,/, "")
 
-  let postData = {
+  img.data = img.data.toString().replace(/data:.+?,/, "")
+  let formData = {
     'name': img.name,
     'image': img.data,
     'type': 'base64'
@@ -124,7 +71,7 @@ export function uploadImg(img, callback) {
   // form.append('name', 'An image');
   // form.append('image', 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
 
-  for (let [key, value] of Object.entries(postData)) {
+  for (let [key, value] of Object.entries(formData)) {
     form.append(key, value);
   }
 
@@ -142,5 +89,4 @@ export function uploadImg(img, callback) {
     .then((res) => res.json())
     .then((data) => callback(data.data))
     .catch((err) => console.error(err));
-
 }
