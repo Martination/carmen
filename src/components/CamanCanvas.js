@@ -8,7 +8,6 @@ import { NotificationToast } from './Bootstrap'
 // import image from './../WP.png'
 import image from './../142.jpg'
 
-// import usePrevious from './usePrevious'
 const caman = window.Caman;
 
 
@@ -73,7 +72,6 @@ const CamanCanvas = () => {
 
   // Throttled could take an options object, but it appears to work fine with default
   const throttled = useRef(throttle((adjustmentList) => (updateImage(adjustmentList)), 100));
-  // const prevList = usePrevious(adjustmentList);
 
   /* Update the image after our adjustments change */
   useEffect(() => {
@@ -119,13 +117,12 @@ const CamanCanvas = () => {
   const updatePresets = (event) => {
     const preset = event.target.id;
 
-    // console.log("Updating preset", preset);
-
     let currentPresets = {};
     if (!presetList[preset]) { currentPresets[preset] = 1; }
 
     setPresetList(currentPresets);
   }
+
 
   function updateImage(adjustmentList) {
     prevRenderList = adjustmentList;
@@ -154,10 +151,6 @@ const CamanCanvas = () => {
   }
 
 
-  /* Presets toggle button */
-  function toggleCollapse() {
-    setPresetToggle(!presetToggle);
-  }
 
   /* Take an image object and update the canvas */
   function updateCanvas(img) {
@@ -190,13 +183,11 @@ const CamanCanvas = () => {
     };
   }
 
-
   /* Take the file from the file browser and set it */
   function uploadFile(event) {
     const file = event.target.files[0];
     setImage(file);
   }
-
 
   function downloadImage() {
 
@@ -215,6 +206,7 @@ const CamanCanvas = () => {
   }
 
 
+  /* Imgur Functions */
   async function importImgur() {
     let form = imgurUrlRef.current;
     let value = form.value;
@@ -268,7 +260,6 @@ const CamanCanvas = () => {
   }, [imgurImgData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function exportImgur() {
-
     let newFilename = filename ? ("carmen-edited_" + filename) : "carmen-edited.jpg"
     let parent = editPaneRef.current;
     let canvas = parent.firstChild;
@@ -288,7 +279,6 @@ const CamanCanvas = () => {
 
   /* Display a toast for either success or failure */
   function uploadConfirmation(result) {
-
     console.log(result);
 
     if (!result || result.error) {
@@ -309,10 +299,11 @@ const CamanCanvas = () => {
     setToast(true);
   }
 
+
   return (
     <>
       <div id="editPane" ref={editPaneRef} className="edit-pane bg-gray container-lg text-center p-4 lh-1">
-        <img id="canvas" alt="Editing Canvas" className="img-fluid" src={image} />
+        <img id="canvas" alt="Editing Canvas" className="img-fluid" aria-label="Editing Canvas" src={image} />
       </div>
 
       <NotificationToast toast={toastDisplay} setToast={setToast}
@@ -361,7 +352,7 @@ const CamanCanvas = () => {
 
           <hr />
           <div className="py-2">
-            <button className="btn btn-primary" onClick={toggleCollapse}
+            <button className="btn btn-primary" onClick={() => setPresetToggle(!presetToggle)}
               data-bs-target="#collapseTarget" data-bs-toggle="collapse">
               <i className={"px-2 bi " + (presetToggle ? "bi-chevron-compact-up" : "bi-chevron-compact-down")} />
               Presets

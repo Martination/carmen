@@ -15,7 +15,7 @@ const FilterListItem = ({ filter, range, filterList, onChange }) => {
     <div className="col">
       <div className="row gx-1 hover">
 
-        <label name={filter} className="col-3 reset"
+        <label name={filter} className="col-3 reset" htmlFor={filter}
           onClick={(event) => resetValue(event, init, onChange)}>{filter}</label>
 
         <div className="col-8">
