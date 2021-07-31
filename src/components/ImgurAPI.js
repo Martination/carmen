@@ -1,5 +1,3 @@
-// import https from 'follow-redirects/https';
-// const fs = require('fs');
 
 export async function getImgBlob(imageUrl, imgId) {
   if (imageUrl) {
@@ -27,14 +25,17 @@ export function getImg(imageId, setImgData) {
   };
 
   return fetch(url, options)
-    .then((res) => res.json())
+    .then((res) => {
+      if (!res.ok || res.status < 200 || res.stauts >= 300) {
+        throw new Error(`Error ${res.status}: ${res.statusText}`);
+      }
+      return res.json()
+    })
     .then((data) => {
       const mime = /image/
-
       if (!mime.test(data.data.type)) {
         throw new Error(`Unsupported Filetype: ${data.data.type}`);
       }
-
       setImgData(data.data);
     });
 }

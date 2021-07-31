@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { Button, Toast } from 'bootstrap';
 import throttle from 'lodash/throttle';
 
 import { getImg, getImgBlob, getAlbum, uploadImg } from './ImgurAPI'
-import FilterListItem from './FilterListItem'
+import { CreatePresetList, CreateFilterList } from './CamanControls'
+import { NotificationToast } from './Bootstrap'
+
 // import image from './../WP.png'
 import image from './../142.jpg'
 
@@ -24,117 +25,6 @@ const caman = window.Caman;
 // vignette, rectangularVignette, tiltShift, radialBlur,
 // boxBlur?, heavyRadialBlur, gaussianBlur, motionBlur,
 // edgeEnhance, edgeDetect, emboss, posterize,
-
-
-function PresetButton({ preset, presetName, onClick, active }) {
-  const buttonRef = useRef();
-
-  let myButton = buttonRef.current;
-  let bsButton = Button.getInstance(myButton);
-
-  if (!bsButton) { bsButton = new Button(myButton, { toggle: "button" }); }
-
-  return (
-    <div className="col p-1 d-grid">
-      <button className={`preset btn btn-primary ${active ? 'active' : null}`}
-        ref={buttonRef} id={preset} onClick={(event) => { onClick(event) }} type="button">
-        {`${presetName}`}
-      </button>
-    </div>
-  );
-}
-
-function NotificationToast({ toast, setToast, status, toastText, display }) {
-  const toastRef = useRef();
-
-  useEffect(() => {
-    let myToast = toastRef.current;
-    let bsToast = Toast.getInstance(myToast);
-
-    if (!bsToast) {
-      bsToast = new Toast(myToast, { autohide: false });
-    } else {
-      toast ? bsToast.show() : bsToast.hide();
-    }
-  }, [toast]);
-
-  return (
-    <>
-      <div className="position-fixed bottom-0 end-0 pe-3 pb-3">
-        <div className="toast hide" role="status" aria-live="polite" aria-atomic="true" ref={toastRef}>
-          <div className="toast-header text-primary">
-            <i className="bi bi-image-fill pe-1"></i>
-            <strong className="me-auto">Carmen Uploader</strong>
-            <small>{status ? "Success" : "Failure"}</small>
-            <button type="button" className="btn-close" aria-label="Close"
-              onClick={() => setToast(toast => !toast)} />
-          </div>
-          <div className="toast-body text-dark">{toastText}</div>
-        </div>
-      </div>
-
-      <div className="py-2">
-        <button className="btn btn-info" onClick={() => setToast(toast => !toast)}>
-          Toast Toggle
-        </button>
-      </div>
-    </>
-  );
-}
-
-
-function CreatePresetList({ presetList, onClick }) {
-  const presets = [
-    "vintage", "lomo", "clarity", "sinCity", "sunrise", "crossProcess", "orangePeel",
-    "love", "grungy", "jarques", "pinhole", "oldBoot", "glowingSun",
-    "hazyDays", "herMajesty", "nostalgia", "hemingway", "concentrate"
-  ];
-
-  const presetsPretty = [
-    "Vintage", "Lomo", "Clarity", "Sin City", "Sunrise", "Cross Process", "Orange Peel",
-    "Love", "Grungy", "Jarques", "Pinhole", "Old Boot", "Glowing Sun",
-    "Hazy Days", "Her Majesty", "Nostalgia", "Hemingway", "Concentrate"
-  ];
-
-  let buttonList = []
-  for (const [index, preset] of presets.entries()) {
-    let isActive = presetList[preset] ? true : false
-    buttonList.push(
-      <PresetButton key={preset} preset={preset} presetName={presetsPretty[index]}
-        onClick={onClick} active={isActive} />
-    )
-  }
-  return buttonList;
-}
-
-function createFilterList(filterList, onChange) {
-  // -100 to 100
-  const filtersFullRange = ["brightness", "contrast", "vibrance", "saturation", "exposure"];
-  // 0 to 100
-  const filtersHalfRange = ["hue", "sepia", "noise", "sharpen", "clip"];
-  const filtersSpecial = { "gamma": { "min": 0, "init": 1, "max": 10, "step": 0.1 } };
-
-  let rangeList = {}
-
-  const rangeFull = { "min": -100, "init": 0, "max": 100 }
-  // Must be for...of; for...in replaces names with indicies
-  for (const filter of filtersFullRange) { rangeList[filter] = rangeFull; }
-
-  const rangeHalf = { "min": 0, "init": 0, "max": 100 }
-  for (const filter of filtersHalfRange) { rangeList[filter] = rangeHalf; }
-  rangeList = { ...rangeList, ...filtersSpecial };
-
-  let filters = [];
-  // Must be for...in, rangeList isn't iterable
-  for (const filter in rangeList) {
-    filters.push(
-      <FilterListItem key={filter} filter={filter} range={rangeList[filter]}
-        filterList={filterList} onChange={onChange} />
-    )
-  }
-
-  return filters;
-}
 
 
 let isRendering = false;
@@ -191,17 +81,10 @@ const CamanCanvas = () => {
     if (JSON.stringify(prevRenderList) !== JSON.stringify(adjustmentList)) {
 
       if (!isRendering) {
-        if (backlog) {
-          isRendering = true;
-        }
-        // console.log("Throttle rendering with", adjustmentList, backlog);
+        if (backlog) { isRendering = true; }
         throttled.current(adjustmentList);
         backlog += 1;
       }
-      // else {
-      //   console.log("Skipped, rendering");
-      // }
-
     }
   }, [adjustmentList]);
 
@@ -367,6 +250,10 @@ const CamanCanvas = () => {
 
     // Get imgId URL and update canvas
     getImg(imgId, setImgurImgData)
+      .then(() => {
+        setToastInfo({ 'success': true, 'text': '' });
+        setToast(false);
+      })
       .catch((err) => {
         console.log(err.message);
         setToastInfo({ 'success': false, 'text': err.message });
@@ -386,7 +273,6 @@ const CamanCanvas = () => {
     let parent = editPaneRef.current;
     let canvas = parent.firstChild;
 
-    // create link
     let img = {};
     img.name = newFilename;
     img.data = canvas.toDataURL("image/jpeg", 1);
@@ -398,7 +284,6 @@ const CamanCanvas = () => {
       setToastInfo({ 'success': false, 'text': err.message });
       setToast(true);
     }
-
   }
 
   /* Display a toast for either success or failure */
@@ -413,7 +298,6 @@ const CamanCanvas = () => {
     }
 
     let link = result.link || '';
-    // let id = result.id || '';
     let deletehash = result.deletehash || '';
 
     let header = /http(s)?:\/\/(www.)?/g
@@ -434,7 +318,7 @@ const CamanCanvas = () => {
       <NotificationToast toast={toastDisplay} setToast={setToast}
         status={toastInfo.success} toastText={toastInfo.text} />
 
-      <div className="row my-1 d-flex align-items-end">
+      <div className="row my-2 d-flex align-items-end">
         <div className="col">
           <label htmlFor="formImgur" className="form-label">Import Image from or Upload to Imgur</label>
           <input className="form-control" id="formImgur" ref={imgurUrlRef} type="text"
@@ -454,7 +338,7 @@ const CamanCanvas = () => {
         </div>
       </div>
 
-      <div className="row my-1 d-flex align-items-end">
+      <div className="row my-2 d-flex align-items-end">
         <div className="col">
           <label htmlFor="formFile" className="form-label">Upload Image from Device</label>
           <input className="form-control" type="file" id="formFile" accept="image/*"
@@ -472,7 +356,7 @@ const CamanCanvas = () => {
         <div id="filterList" className="container overflow-hidden bg-dark text-center my-3 p-2">
 
           <div className="row row-cols-1 row-cols-md-2 center">
-            {createFilterList(filterList, updateFilters)}
+            <CreateFilterList filterList={filterList} onChange={updateFilters} />
           </div>
 
           <hr />
