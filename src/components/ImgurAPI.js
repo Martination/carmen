@@ -68,9 +68,6 @@ export function uploadImg(img, callback) {
   };
 
   const form = new FormData();
-  // form.append('name', 'An image');
-  // form.append('image', 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
-
   for (let [key, value] of Object.entries(formData)) {
     form.append(key, value);
   }
@@ -85,8 +82,7 @@ export function uploadImg(img, callback) {
     'body': form
   };
 
-  fetch(url, options)
+  return fetch(url, options)
     .then((res) => res.json())
-    .then((data) => callback(data.data))
-    .catch((err) => console.error(err));
+    .then((data) => callback(data.data));
 }

@@ -64,7 +64,7 @@ function NotificationToast({ toast, setToast, status, toastText, display }) {
         <div className="toast hide" role="status" aria-live="polite" aria-atomic="true" ref={toastRef}>
           <div className="toast-header text-primary">
             <i className="bi bi-image-fill pe-1"></i>
-            <strong className="me-auto">Imgur Upload</strong>
+            <strong className="me-auto">Carmen Uploader</strong>
             <small>{status ? "Success" : "Failure"}</small>
             <button type="button" className="btn-close" aria-label="Close"
               onClick={() => setToast(toast => !toast)} />
@@ -391,19 +391,38 @@ const CamanCanvas = () => {
     img.name = newFilename;
     img.data = canvas.toDataURL("image/jpeg", 1);
 
-    uploadImg(img, uploadConfirmation);
+    try {
+      uploadImg(img, uploadConfirmation);
+    } catch (err) {
+      console.log(err);
+      setToastInfo({ 'success': false, 'text': err.message });
+      setToast(true);
+    }
 
   }
 
+  /* Display a toast for either success or failure */
   function uploadConfirmation(result) {
-    // Display a toast for either success (w/delete hash, ID, link, etc) or failure
-    let link = result.link;
-    let id = result.id;
-    let deletehash = result.deletehash;
 
     console.log(result);
 
-    alert(`Link ${link}, Id ${id}, Delete Hash ${deletehash}`);
+    if (!result || result.error) {
+      setToastInfo({ 'success': false, 'text': `Error: ${result?.error || "Unknown Error"}` });
+      setToast(true);
+      return;
+    }
+
+    let link = result.link || '';
+    // let id = result.id || '';
+    let deletehash = result.deletehash || '';
+
+    let header = /http(s)?:\/\/(www.)?/g
+    let displayLink = link.replace(header, "");
+
+    let a = <a href={link} target="_blank" rel="noreferrer">{displayLink}</a>
+    let div = <div>Image uploaded to {a}. The code to delete it is <samp>{deletehash}</samp>.</div>;
+    setToastInfo({ 'success': true, 'text': div });
+    setToast(true);
   }
 
   return (
@@ -415,7 +434,7 @@ const CamanCanvas = () => {
       <NotificationToast toast={toastDisplay} setToast={setToast}
         status={toastInfo.success} toastText={toastInfo.text} />
 
-      <div className="row my-3 d-flex align-items-end">
+      <div className="row my-1 d-flex align-items-end">
         <div className="col">
           <label htmlFor="formImgur" className="form-label">Import Image from or Upload to Imgur</label>
           <input className="form-control" id="formImgur" ref={imgurUrlRef} type="text"
@@ -435,7 +454,7 @@ const CamanCanvas = () => {
         </div>
       </div>
 
-      <div className="row my-3 d-flex align-items-end">
+      <div className="row my-1 d-flex align-items-end">
         <div className="col">
           <label htmlFor="formFile" className="form-label">Upload Image from Device</label>
           <input className="form-control" type="file" id="formFile" accept="image/*"
