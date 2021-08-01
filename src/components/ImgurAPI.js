@@ -9,9 +9,6 @@ export async function getImgBlob(imageUrl, imgId) {
   }
 }
 
-// https://imgur.com/h961kWg
-// https://imgur.com/a/3AMDPNA
-
 export function getImg(imageId, setImgData) {
 
   let url = `https://api.imgur.com/3/image/${imageId}`;
@@ -86,4 +83,26 @@ export function uploadImg(img, callback) {
   return fetch(url, options)
     .then((res) => res.json())
     .then((data) => callback(data.data));
+}
+
+export function deleteImgur(deletehash, callback) {
+
+  let url = `https://api.imgur.com/3/image/${deletehash}`;
+
+  const options = {
+    'method': 'DELETE',
+    'headers': {
+      'Authorization': `Client-ID ${process.env.REACT_APP_CLIENTID}`,
+    },
+    'maxRedirects': 20,
+  };
+
+  return fetch(url, options)
+    .then((res) => {
+      if (!res.ok || res.status < 200 || res.stauts >= 300) {
+        throw new Error(`Error ${res.status}: ${res.statusText}`);
+      }
+      return res.json()
+    })
+    .then((data) => callback(data));
 }

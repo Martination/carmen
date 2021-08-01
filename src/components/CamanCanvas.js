@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import throttle from 'lodash/throttle';
 
-import { getImg, getImgBlob, getAlbum, uploadImg } from './ImgurAPI'
+import { getImg, getImgBlob, getAlbum, uploadImg, deleteImgur } from './ImgurAPI'
 import { CreatePresetList, CreateFilterList } from './CamanControls'
 import { NotificationToast } from './Bootstrap'
 
@@ -235,7 +235,8 @@ const CamanCanvas = () => {
       console.log(imgId);
 
     } else {
-      setToastInfo({ 'success': false, 'text': "No Imgur Image ID found. Please use the direct URL to the image." });
+      let message = 'No Imgur Image ID found. Please use the direct URL to the image.'
+      setToastInfo({ 'success': false, 'text': message });
       setToast(true);
       return;
     }
@@ -299,6 +300,44 @@ const CamanCanvas = () => {
     setToast(true);
   }
 
+  /* Delete an Image from Imgur using the deletehash */
+  function deleteImage() {
+
+    let form = imgurUrlRef.current;
+    let value = form.value;
+
+    // deleteHash is 15 chars long
+    const hash = /\w{15}/
+
+    let deletehash = value.match(hash);
+    if (!deletehash) {
+      let error = 'No delete code found. Paste the 15 character delete code into the text box.';
+      setToastInfo({ 'success': false, 'text': error });
+      setToast(true);
+      return;
+    }
+
+    deleteImgur(deletehash, deleteConfirmation)
+      .catch((err) => {
+        console.log(err.message);
+        setToastInfo({ 'success': false, 'text': err.message });
+        setToast(true);
+      });
+  }
+
+  function deleteConfirmation(result) {
+    console.log(result);
+
+    if (!result || !result.success || result.error) {
+      setToastInfo({ 'success': false, 'text': `Error: ${result?.error || 'Unknown Error'}` });
+      setToast(true);
+      return;
+    }
+
+    setToastInfo({ 'success': true, 'text': 'Image successfully deleted.' });
+    setToast(true);
+  }
+
 
   return (
     <>
@@ -312,9 +351,24 @@ const CamanCanvas = () => {
       <div className="row my-2 d-flex align-items-end">
         <div className="col">
           <label htmlFor="formImgur" className="form-label">Import Image from or Upload to Imgur</label>
-          <input className="form-control" id="formImgur" ref={imgurUrlRef} type="text"
-            placeholder="https://imgur.com/..." aria-labelledby="formImgur" required />
+          <div className="btn-group" style={{ width: '100%' }}>
+
+            <input id="formImgur" ref={imgurUrlRef} type="text" placeholder="https://imgur.com/..."
+              className="form-control btn bg-light border-light text-start user-select-auto pe-0"
+              style={{ cursor: 'text' }} aria-labelledby="formImgur" />
+
+            <button type="button" className="btn btn-light dropdown-toggle dropdown-toggle-split"
+              data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+              <span className="visually-hidden">Dropdown Menu</span>
+            </button>
+            <ul className="dropdown-menu dropdown-menu-end dropdown-menu-dark">
+              <li><button className="dropdown-item" onClick={deleteImage}>
+                Delete previously uploaded image
+              </button></li>
+            </ul>
+          </div>
         </div>
+
         <div className="col col-auto text-center ps-0">
           <button id="downloadImage" className="btn btn-primary" type="submit" onClick={importImgur}>
             <i className="d-block d-md-none bi bi-cloud-download" />
@@ -332,9 +386,11 @@ const CamanCanvas = () => {
       <div className="row my-2 d-flex align-items-end">
         <div className="col">
           <label htmlFor="formFile" className="form-label">Upload Image from Device</label>
+
           <input className="form-control" type="file" id="formFile" accept="image/*"
             aria-labelledby="formFile" onChange={uploadFile} />
         </div>
+
         <div className="col col-auto text-center ps-0">
           <button id="downloadImage" className="btn btn-primary" onClick={downloadImage}>
             <i className="d-block d-md-none bi bi-download" />
@@ -358,13 +414,13 @@ const CamanCanvas = () => {
               Presets
               <i className={"px-2 bi " + (presetToggle ? "bi-chevron-compact-up" : "bi-chevron-compact-down")} />
             </button>
+
             <div className="collapse pt-2" id="collapseTarget">
               <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 m-1">
                 <CreatePresetList presetList={presetList} onClick={updatePresets} />
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
