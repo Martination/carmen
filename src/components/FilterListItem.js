@@ -5,16 +5,15 @@ const resetValue = (event, init, onChange) => {
 }
 
 const FilterListItem = ({ filter, range, filterList, onChange }) => {
-  const min = range["min"] != null ? range["min"] : -100;
-  const max = range["max"] != null ? range["max"] : 100;
-  const step = range["step"] || 1;
-  const init = range["init"] || 0;
+  const min = range['min'] != null ? range['min'] : -100;
+  const max = range['max'] != null ? range['max'] : 100;
+  const step = range['step'] || 1;
+  const init = range['init'] || 0;
   const curValue = (filterList[filter] != null) ? filterList[filter] : init;
 
   return (
     <div className="col">
       <div className="row gx-1 hover">
-
         <label name={filter} className="col-3 reset" htmlFor={filter}
           onClick={(event) => resetValue(event, init, onChange)}>{filter}</label>
 
@@ -26,7 +25,6 @@ const FilterListItem = ({ filter, range, filterList, onChange }) => {
 
         <span name={filter} className="col-1 reset"
           onClick={(event) => resetValue(event, init, onChange)}>{curValue}</span>
-
       </div>
     </div>
   );

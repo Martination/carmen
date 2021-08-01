@@ -1,4 +1,3 @@
-
 export async function getImgBlob(imageUrl, imgId) {
   if (imageUrl) {
     let response = await fetch(imageUrl);
@@ -26,7 +25,7 @@ export function getImg(imageId, setImgData) {
       if (!res.ok || res.status < 200 || res.stauts >= 300) {
         throw new Error(`Error ${res.status}: ${res.statusText}`);
       }
-      return res.json()
+      return res.json();
     })
     .then((data) => {
       const mime = /image/
@@ -58,11 +57,11 @@ export function getAlbum(albumId) {
 
 export function uploadImg(img, callback) {
 
-  img.data = img.data.toString().replace(/data:.+?,/, "")
+  img.data = img.data.toString().replace(/data:.+?,/, "");
   let formData = {
     'name': img.name,
     'image': img.data,
-    'type': 'base64'
+    'type': 'base64',
   };
 
   const form = new FormData();
@@ -77,7 +76,7 @@ export function uploadImg(img, callback) {
       'Authorization': `Client-ID ${process.env.REACT_APP_CLIENTID}`,
     },
     'maxRedirects': 20,
-    'body': form
+    'body': form,
   };
 
   return fetch(url, options)
@@ -102,7 +101,7 @@ export function deleteImgur(deletehash, callback) {
       if (!res.ok || res.status < 200 || res.stauts >= 300) {
         throw new Error(`Error ${res.status}: ${res.statusText}`);
       }
-      return res.json()
+      return res.json();
     })
     .then((data) => callback(data));
 }

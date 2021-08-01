@@ -2,9 +2,9 @@ import { useEffect, useRef } from 'react';
 import { Button, Toast } from 'bootstrap';
 
 export function PresetButton({ preset, presetName, onClick, active }) {
-  const buttonRef = useRef();
+  const buttonRef = useRef(null);
 
-  let myButton = buttonRef.current;
+  const myButton = buttonRef.current;
   let bsButton = Button.getInstance(myButton);
 
   if (!bsButton) { bsButton = new Button(myButton, { toggle: "button" }); }
@@ -20,10 +20,10 @@ export function PresetButton({ preset, presetName, onClick, active }) {
 }
 
 export function NotificationToast({ toast, setToast, status, toastText }) {
-  const toastRef = useRef();
+  const toastRef = useRef(null);
 
   useEffect(() => {
-    let myToast = toastRef.current;
+    const myToast = toastRef.current;
     let bsToast = Toast.getInstance(myToast);
 
     if (!bsToast) {
@@ -34,19 +34,17 @@ export function NotificationToast({ toast, setToast, status, toastText }) {
   }, [toast]);
 
   return (
-    <>
-      <div className="position-fixed bottom-0 end-0 pe-3 pb-3">
-        <div className="toast hide" role="status" aria-live="polite" aria-atomic="true" ref={toastRef}>
-          <div className="toast-header text-primary">
-            <i className="bi bi-image-fill pe-1"></i>
-            <strong className="me-auto">Carmen Uploader</strong>
-            <small>{status ? "Success" : "Failure"}</small>
-            <button type="button" className="btn-close" aria-label="Close"
-              onClick={() => setToast(toast => !toast)} />
-          </div>
-          <div className="toast-body text-dark">{toastText}</div>
+    <div className="position-fixed bottom-0 end-0 pe-3 pb-3">
+      <div className="toast hide" role="status" aria-live="polite" aria-atomic="true" ref={toastRef}>
+        <div className="toast-header text-primary">
+          <i className="bi bi-image-fill pe-1"></i>
+          <strong className="me-auto">Carmen Uploader</strong>
+          <small>{status ? "Success" : "Failure"}</small>
+          <button type="button" className="btn-close" aria-label="Close"
+            onClick={() => setToast(toast => !toast)} />
         </div>
+        <div className="toast-body text-dark">{toastText}</div>
       </div>
-    </>
+    </div>
   );
 }

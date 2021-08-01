@@ -1,4 +1,4 @@
-import CamanCanvas from './components/CamanCanvas'
+import CamanCanvas from './components/CamanCanvas';
 
 function App() {
 

@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import throttle from 'lodash/throttle';
 
-import { getImg, getImgBlob, getAlbum, uploadImg, deleteImgur } from './ImgurAPI'
-import { CreatePresetList, CreateFilterList } from './CamanControls'
-import { NotificationToast } from './Bootstrap'
+import { getImg, getImgBlob, getAlbum, uploadImg, deleteImgur } from './ImgurAPI';
+import { CreatePresetList, CreateFilterList } from './CamanControls';
+import { NotificationToast } from './Bootstrap';
 
-// import image from './../WP.png'
-import image from './../142.jpg'
+import image from './../WP.png';
+// import image from './../142.jpg';
 
 const caman = window.Caman;
 
@@ -32,25 +32,23 @@ let backlog = 0;
 let updateImgFn = () => { };
 const throttledEventListen = throttle((curRenderList) => (updateImgFn(curRenderList)), 1000);
 
-caman.Event.listen("processStart", function (job) {
-  // console.log("Start:", job.name);
+caman.Event.listen('processStart', (job) => {
+  // console.log('Start:', job.name);
   isRendering = true;
 });
 
-caman.Event.listen("processComplete", function (job) {
-  // console.log("Finish:", job.name);
+caman.Event.listen('processComplete', (job) => {
+  // console.log('Finish:', job.name);
   isRendering = false;
   backlog = 0;
   if (JSON.stringify(prevRenderList) !== JSON.stringify(curRenderList)) {
-    // console.log("Updating from prev render", prevRenderList, curRenderList)
-    // updateImgFn(curRenderList);
     throttledEventListen(curRenderList);
   }
 });
 
 
 // window.Caman.DEBUG = true
-let htmlCanvas = "#canvas";
+const htmlCanvas = '#canvas';
 caman(htmlCanvas, image, function () {
   this.render();
 });
@@ -60,7 +58,7 @@ const CamanCanvas = () => {
   const [filterList, setFilterList] = useState({});
   const [adjustmentList, setAdjustmentList] = useState({});
   const [presetToggle, setPresetToggle] = useState(false);
-  const [filename, setFilename] = useState("");
+  const [filename, setFilename] = useState('');
   const [imgurImgData, setImgurImgData] = useState({});
   const [toastDisplay, setToast] = useState(false);
   const [toastInfo, setToastInfo] = useState({ 'success': true, 'text': '' });
@@ -75,7 +73,6 @@ const CamanCanvas = () => {
 
   /* Update the image after our adjustments change */
   useEffect(() => {
-    // if (JSON.stringify(prevList) !== JSON.stringify(adjustmentList)) {
     if (JSON.stringify(prevRenderList) !== JSON.stringify(adjustmentList)) {
 
       if (!isRendering) {
@@ -94,10 +91,10 @@ const CamanCanvas = () => {
 
 
   /* Sliders Callback */
-  const updateFilters = (event, init) => {
+  function updateFilters(event, init) {
     const filter = event.target.name;
     const value = parseFloat(event.target.value);
-    console.log("Updating", filter);
+    console.log('Updating', filter);
 
     let newList;
     if (value === init) {
@@ -114,21 +111,17 @@ const CamanCanvas = () => {
   }
 
   /* Button Callback */
-  const updatePresets = (event) => {
+  function updatePresets(event) {
     const preset = event.target.id;
-
-    let currentPresets = {};
-    if (!presetList[preset]) { currentPresets[preset] = 1; }
-
-    setPresetList(currentPresets);
+    setPresetList(presetList[preset] ? {} : { [preset]: 1 });
   }
 
 
   function updateImage(adjustmentList) {
     prevRenderList = adjustmentList;
     caman(htmlCanvas, function () {
-      console.log("~~~~ UPDATE IMAGE ~~~~")
-      console.log(adjustmentList)
+      console.log('~~~~ UPDATE IMAGE ~~~~');
+      console.log(adjustmentList);
 
       this.revert(false);
       for (const filter in adjustmentList) {
@@ -154,14 +147,14 @@ const CamanCanvas = () => {
 
   /* Take an image object and update the canvas */
   function updateCanvas(img) {
-    let parent = editPaneRef.current;
-    let canvas = parent.firstChild;
-    let context = canvas.getContext("2d");
+    const parent = editPaneRef.current;
+    const canvas = parent.firstChild;
+    const context = canvas.getContext('2d');
 
     canvas.width = img.width;
     canvas.height = img.height;
     context.drawImage(img, 0, 0, img.width, img.height);
-    canvas.removeAttribute("data-caman-id");
+    canvas.removeAttribute('data-caman-id');
 
     updateImage(adjustmentList);
   }
@@ -176,7 +169,7 @@ const CamanCanvas = () => {
     }
 
     reader.onload = () => {
-      let img = new Image();
+      const img = new Image();
       img.src = reader.result;
 
       img.onload = () => { updateCanvas(img); };
@@ -191,40 +184,40 @@ const CamanCanvas = () => {
 
   function downloadImage() {
 
-    let newFilename = filename ? ("carmen-edited_" + filename) : "carmen-edited.jpg"
-    console.log("Downloading", newFilename);
+    const newFilename = filename ? ('carmen-edited_' + filename) : 'carmen-edited.jpg';
+    console.log('Downloading', newFilename);
 
-    let parent = editPaneRef.current;
-    let canvas = parent.firstChild;
+    const parent = editPaneRef.current;
+    const canvas = parent.firstChild;
 
     // create link
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.download = newFilename;
-    link.href = canvas.toDataURL("image/jpeg", 1);
-    let e = new MouseEvent("click");
-    link.dispatchEvent(e);
+    link.href = canvas.toDataURL('image/jpeg', 1);
+    // const e = new MouseEvent('click');
+    link.dispatchEvent(new MouseEvent('click'));
   }
 
 
   /* Imgur Functions */
   async function importImgur() {
-    let form = imgurUrlRef.current;
-    let value = form.value;
+    const form = imgurUrlRef.current;
+    const value = form.value;
 
     if (!value) {
-      setToastInfo({ 'success': false, 'text': "Must provide an Imgur URL" })
+      setToastInfo({ 'success': false, 'text': 'Must provide an Imgur URL.' });
       setToast(true);
       return;
     }
 
     // imageID is 7 chars long
-    const regex = /\w{7}/g
-    const album = /\/gallery\/|\/a\//g
+    const regex = /\w{7}/g;
+    const album = /\/gallery\/|\/a\//g;
 
     let imgId;
     if (album.test(value)) {
       imgId = value.split(album)[1];
-      imgId = imgId.substring(0, 7)  // In case anything is after the id
+      imgId = imgId.substring(0, 7);  // In case anything is after the id
 
       // Do album look up to get real cover imgId
       imgId = await getAlbum(imgId);
@@ -235,7 +228,7 @@ const CamanCanvas = () => {
       console.log(imgId);
 
     } else {
-      let message = 'No Imgur Image ID found. Please use the direct URL to the image.'
+      const message = 'No Imgur Image ID found. Please use the direct URL to the image.';
       setToastInfo({ 'success': false, 'text': message });
       setToast(true);
       return;
@@ -261,13 +254,13 @@ const CamanCanvas = () => {
   }, [imgurImgData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function exportImgur() {
-    let newFilename = filename ? ("carmen-edited_" + filename) : "carmen-edited.jpg"
-    let parent = editPaneRef.current;
-    let canvas = parent.firstChild;
+    const newFilename = filename ? ('carmen-edited_' + filename) : 'carmen-edited.jpg';
+    const parent = editPaneRef.current;
+    const canvas = parent.firstChild;
 
     let img = {};
     img.name = newFilename;
-    img.data = canvas.toDataURL("image/jpeg", 1);
+    img.data = canvas.toDataURL('image/jpeg', 1);
 
     try {
       uploadImg(img, uploadConfirmation);
@@ -283,19 +276,19 @@ const CamanCanvas = () => {
     console.log(result);
 
     if (!result || result.error) {
-      setToastInfo({ 'success': false, 'text': `Error: ${result?.error || "Unknown Error"}` });
+      setToastInfo({ 'success': false, 'text': `Error: ${result?.error || 'Unknown Error'}` });
       setToast(true);
       return;
     }
 
-    let link = result.link || '';
-    let deletehash = result.deletehash || '';
+    const link = result.link || '';
+    const deletehash = result.deletehash || '';
 
-    let header = /http(s)?:\/\/(www.)?/g
-    let displayLink = link.replace(header, "");
+    const header = /http(s)?:\/\/(www.)?/g;
+    const displayLink = link.replace(header, '');
 
-    let a = <a href={link} target="_blank" rel="noreferrer">{displayLink}</a>
-    let div = <div>Image uploaded to {a}. The code to delete it is <samp>{deletehash}</samp>.</div>;
+    const a = <a href={link} target="_blank" rel="noreferrer">{displayLink}</a>;
+    const div = <div>Image uploaded to {a}. The code to delete it is <samp>{deletehash}</samp>.</div>;
     setToastInfo({ 'success': true, 'text': div });
     setToast(true);
   }
@@ -303,15 +296,15 @@ const CamanCanvas = () => {
   /* Delete an Image from Imgur using the deletehash */
   function deleteImage() {
 
-    let form = imgurUrlRef.current;
-    let value = form.value;
+    const form = imgurUrlRef.current;
+    const value = form.value;
 
     // deleteHash is 15 chars long
-    const hash = /\w{15}/
+    const hash = /\w{15}/;
 
-    let deletehash = value.match(hash);
+    const deletehash = value.match(hash);
     if (!deletehash) {
-      let error = 'No delete code found. Paste the 15 character delete code into the text box.';
+      const error = 'No delete code found. Paste the 15 character delete code into the text box.';
       setToastInfo({ 'success': false, 'text': error });
       setToast(true);
       return;
@@ -357,8 +350,8 @@ const CamanCanvas = () => {
               className="form-control btn bg-light border-light text-start user-select-auto pe-0"
               style={{ cursor: 'text' }} aria-labelledby="formImgur" />
 
-            <button type="button" className="btn btn-light dropdown-toggle dropdown-toggle-split"
-              data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+            <button type="button" data-bs-toggle="dropdown" aria-expanded="false"
+              className="btn btn-light dropdown-toggle dropdown-toggle-split">
               <span className="visually-hidden">Dropdown Menu</span>
             </button>
             <ul className="dropdown-menu dropdown-menu-end dropdown-menu-dark">
@@ -423,7 +416,6 @@ const CamanCanvas = () => {
           </div>
         </div>
       </div>
-
     </>
   );
 }
