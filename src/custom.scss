@@ -70,12 +70,12 @@ $form-range-track-hover: #DEE2E6;
   box-shadow: none;
 }
 
+#filterList button:focus:focus-visible {
+  box-shadow: none;
+}
+
 // Visually set inactive but focused presets to default
 .preset.btn:focus-within:not(.active):not(:hover) {
   background-color: $primary;
   border-color: $primary;
-}
-
-#filterList label {
-  text-transform: capitalize;
 }

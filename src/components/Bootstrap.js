@@ -41,7 +41,7 @@ export function NotificationToast({ toast, setToast, status, toastText }) {
           <strong className="me-auto">Carmen Uploader</strong>
           <small>{status ? "Success" : "Failure"}</small>
           <button type="button" className="btn-close" aria-label="Close"
-            onClick={() => setToast(toast => !toast)} />
+            onClick={() => setToast(false)} />
         </div>
         <div className="toast-body text-dark">{toastText}</div>
       </div>

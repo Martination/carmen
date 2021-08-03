@@ -173,6 +173,8 @@ const CamanCanvas = () => {
       img.src = reader.result;
 
       img.onload = () => { updateCanvas(img); };
+      setToastInfo({ 'success': true, 'text': '' });
+      setToast(false);
     };
   }
 
@@ -249,7 +251,7 @@ const CamanCanvas = () => {
 
   useEffect(() => {
     getImgBlob(imgurImgData.link, imgurImgData.id)
-      .then(result => setImage(result))
+      .then((result) => setImage(result))
       .catch((err) => console.error(err));
   }, [imgurImgData]); // eslint-disable-line react-hooks/exhaustive-deps
 
