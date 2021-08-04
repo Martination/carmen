@@ -3,20 +3,20 @@ import FilterListItem from './FilterListItem';
 
 export function CreatePresetList({ presetList, onClick }) {
   const presets = [
-    "vintage", "lomo", "clarity", "sinCity", "sunrise", "crossProcess", "orangePeel",
-    "love", "grungy", "jarques", "pinhole", "oldBoot", "glowingSun",
-    "hazyDays", "herMajesty", "nostalgia", "hemingway", "concentrate"
+    "greyscale", "invert", "vintage", "lomo", "clarity", "sinCity", "sunrise",
+    "crossProcess", "orangePeel", "love", "grungy", "jarques", "pinhole", "oldBoot",
+    "glowingSun", "hazyDays", "herMajesty", "nostalgia", "hemingway", "concentrate"
   ];
 
   const presetsPretty = [
-    "Vintage", "Lomo", "Clarity", "Sin City", "Sunrise", "Cross Process", "Orange Peel",
-    "Love", "Grungy", "Jarques", "Pinhole", "Old Boot", "Glowing Sun",
-    "Hazy Days", "Her Majesty", "Nostalgia", "Hemingway", "Concentrate"
+    "Grayscale", "Invert", "Vintage", "Lomo", "Clarity", "Sin City", "Sunrise",
+    "Cross Process", "Orange Peel", "Love", "Grungy", "Jarques", "Pinhole", "Old Boot",
+    "Glowing Sun", "Hazy Days", "Her Majesty", "Nostalgia", "Hemingway", "Concentrate"
   ];
 
   let buttonList = [];
   for (const [index, preset] of presets.entries()) {
-    const isActive = presetList[preset] ? true : false;
+    const isActive = (presetList === preset) ? true : false;
     buttonList.push(
       <PresetButton key={preset} preset={preset} presetName={presetsPretty[index]}
         onClick={onClick} active={isActive} />

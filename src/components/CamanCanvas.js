@@ -32,12 +32,12 @@ let updateImgFn = () => { };
 const throttledEventListen = throttle((curRenderList) => (updateImgFn(curRenderList)), 1000);
 
 caman.Event.listen('processStart', (job) => {
-  // console.log('Start:', job.name);
+  console.log('Start:', job.name);
   isRendering = true;
 });
 
 caman.Event.listen('processComplete', (job) => {
-  // console.log('Finish:', job.name);
+  console.log('Finish:', job.name);
   isRendering = false;
   backlog = 0;
   if (JSON.stringify(prevRenderList) !== JSON.stringify(curRenderList)) {
@@ -46,16 +46,15 @@ caman.Event.listen('processComplete', (job) => {
 });
 
 
-// window.Caman.DEBUG = true
+window.Caman.DEBUG = true
 const htmlCanvas = '#canvas';
 caman(htmlCanvas, image, function () {
   this.render();
 });
 
 const CamanCanvas = () => {
-  const [presetList, setPresetList] = useState({});
+  const [presetList, setPresetList] = useState('');
   const [filterList, setFilterList] = useState({});
-  const [adjustmentList, setAdjustmentList] = useState({});
   const [presetToggle, setPresetToggle] = useState(false);
   const editPaneRef = useRef(null);
 
@@ -63,24 +62,47 @@ const CamanCanvas = () => {
 
 
   // Throttled could take an options object, but it appears to work fine with default
-  const throttled = useRef(throttle((adjustmentList) => (updateImage(adjustmentList)), 100));
+  const throttled = useRef(throttle((curRenderList) => (updateImage(curRenderList)), 100));
 
-  /* Update the image after our adjustments change */
+  /* Combine presets and filters into master adjustment list and update the image */
   useEffect(() => {
-    if (JSON.stringify(prevRenderList) !== JSON.stringify(adjustmentList)) {
 
+    // console.log("New list", filterList);
+
+    // Check for invalid presets
+    let preset = presetList;
+    if (presetList && !caman.prototype[presetList]) {
+      console.log(`${presetList} is not a valid preset.`);
+      setPresetList(preset = '');
+    }
+
+    // Check for invalid filters
+    let filters = { ...filterList };
+    for (const filter in filterList) {
+      if (!caman.prototype[filter]) {
+        console.log(`${filter} is not a valid filter.`);
+        delete filters[filter];
+        setFilterList(filters);
+      }
+    }
+
+    // Combine the two lists
+    let newList;
+    if (preset) { newList = { [preset]: 1 }; }
+    if (filterList !== {}) { newList = { ...newList, ...filters }; }
+    curRenderList = newList;
+
+    // If it's not identical, re-render Caman
+    console.log("New list", newList);
+    if (JSON.stringify(prevRenderList) !== JSON.stringify(newList)) {
+      console.log(newList, prevRenderList, curRenderList, isRendering, backlog);
       if (!isRendering) {
-        if (backlog) { isRendering = true; }
-        throttled.current(adjustmentList);
+        // if (backlog) { isRendering = true; }
+        console.log("Throttled New list", newList);
+        throttled.current(newList);   // Throttled calls updateImage()
         backlog += 1;
       }
     }
-  }, [adjustmentList]);
-
-  /* Combine presets and filters into master adjustment list */
-  useEffect(() => {
-    const newList = { ...presetList, ...filterList }
-    setAdjustmentList(curRenderList = newList);
   }, [filterList, presetList]);
 
 
@@ -99,21 +121,20 @@ const CamanCanvas = () => {
       newList = { ...filterList, [filter]: value };
     }
 
-    // if (JSON.stringify(newList) !== JSON.stringify(filterList)) {
     setFilterList(newList);
-    // }
   }
 
   /* Button Callback */
   function updatePresets(event) {
     const preset = event.target.id;
     // function to guarantee using the latest presetList
-    setPresetList((presetList) => presetList[preset] ? {} : { [preset]: 1 });
+    setPresetList((presetList) => presetList === preset ? '' : preset);
   }
 
 
   function updateImage(adjustmentList) {
     prevRenderList = adjustmentList;
+    console.log("Update image", adjustmentList, prevRenderList);
     caman(htmlCanvas, function () {
       console.log('~~~~ UPDATE IMAGE ~~~~');
       console.log(adjustmentList);
@@ -124,14 +145,7 @@ const CamanCanvas = () => {
         if (this[filter]) {
           this[filter](adjustmentList[filter]);
         } else {
-          console.log(`${filter} is not a valid filter.`);
-          let newList = { ...adjustmentList };
-          delete newList[filter];
-          // Invalid filters will usually be at the end of the list because they get removed each render
-          // So we can just render and it will look okay until the updated re-render
-          this.render();
-          setAdjustmentList(newList);
-          return;
+          console.log(`~${filter}~ is not a valid filter.`);
         }
       }
       this.render();
@@ -150,7 +164,7 @@ const CamanCanvas = () => {
     context.drawImage(img, 0, 0, img.width, img.height);
     canvas.removeAttribute('data-caman-id');
 
-    updateImage(adjustmentList);
+    updateImage(curRenderList);
   }
 
 
