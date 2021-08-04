@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import throttle from 'lodash/throttle';
 
-import { getImg, getImgBlob, getAlbum, uploadImg, deleteImgur } from './ImgurAPI';
+// import { getImg, getImgBlob, getAlbum, uploadImg, deleteImgur } from './ImgurAPI';
 import { CreatePresetList, CreateFilterList } from './CamanControls';
 import FileControls from './FileControls';
 // import { NotificationToast } from './Bootstrap';
@@ -59,12 +59,12 @@ const CamanCanvas = () => {
   const [filterList, setFilterList] = useState({});
   const [adjustmentList, setAdjustmentList] = useState({});
   const [presetToggle, setPresetToggle] = useState(false);
-  const [filename, setFilename] = useState('');
-  const [imgurImgData, setImgurImgData] = useState({});
-  const [toastDisplay, setToast] = useState(false);
-  const [toastInfo, setToastInfo] = useState({ 'success': true, 'text': '' });
+  // const [filename, setFilename] = useState('');
+  // const [imgurImgData, setImgurImgData] = useState({});
+  // const [toastDisplay, setToast] = useState(false);
+  // const [toastInfo, setToastInfo] = useState({ 'success': true, 'text': '' });
   const editPaneRef = useRef(null);
-  const imgurUrlRef = useRef(null);
+  // const imgurUrlRef = useRef(null);
 
   updateImgFn = updateImage;  // Save function so Caman Event listener can call it
 
@@ -162,23 +162,23 @@ const CamanCanvas = () => {
   }
 
   /* Read a file and upate the canvas */
-  function setImage(file) {
-    const reader = new FileReader();
-    if (file) {
-      setFilename(file.name);
-      // read data as URL
-      reader.readAsDataURL(file);
-    }
+  // function setImage(file) {
+  //   const reader = new FileReader();
+  //   if (file) {
+  //     setFilename(file.name);
+  //     // read data as URL
+  //     reader.readAsDataURL(file);
+  //   }
 
-    reader.onload = () => {
-      const img = new Image();
-      img.src = reader.result;
+  //   reader.onload = () => {
+  //     const img = new Image();
+  //     img.src = reader.result;
 
-      img.onload = () => { updateCanvas(img); };
-      setToastInfo({ 'success': true, 'text': '' });
-      setToast(false);
-    };
-  }
+  //     img.onload = () => { updateCanvas(img); };
+  //     setToastInfo({ 'success': true, 'text': '' });
+  //     setToast(false);
+  //   };
+  // }
 
   /* Take the file from the file browser and set it */
   // function uploadFile(event) {
@@ -205,148 +205,147 @@ const CamanCanvas = () => {
 
 
   /* Imgur Functions */
-  async function importImgur() {
-    const form = imgurUrlRef.current;
-    const value = form.value;
+  // async function importImgur() {
+  //   const form = imgurUrlRef.current;
+  //   const value = form.value;
 
-    if (!value) {
-      setToastInfo({ 'success': false, 'text': 'Must provide an Imgur URL.' });
-      setToast(true);
-      return;
-    }
+  //   if (!value) {
+  //     setToastInfo({ 'success': false, 'text': 'Must provide an Imgur URL.' });
+  //     setToast(true);
+  //     return;
+  //   }
 
-    // imageID is 7 chars long
-    const regex = /\w{7}/g;
-    const album = /\/gallery\/|\/a\//g;
+  //   // imageID is 7 chars long
+  //   const regex = /\w{7}/g;
+  //   const album = /\/gallery\/|\/a\//g;
 
-    let imgId;
-    if (album.test(value)) {
-      imgId = value.split(album)[1];
-      imgId = imgId.substring(0, 7);  // In case anything is after the id
+  //   let imgId;
+  //   if (album.test(value)) {
+  //     imgId = value.split(album)[1];
+  //     imgId = imgId.substring(0, 7);  // In case anything is after the id
 
-      // Do album look up to get real cover imgId
-      imgId = await getAlbum(imgId);
-      console.log(imgId);
+  //     // Do album look up to get real cover imgId
+  //     imgId = await getAlbum(imgId);
+  //     console.log(imgId);
 
-    } else if (regex.test(value)) {
-      imgId = value.match(regex)[0];
-      console.log(imgId);
+  //   } else if (regex.test(value)) {
+  //     imgId = value.match(regex)[0];
+  //     console.log(imgId);
 
-    } else {
-      const message = 'No Imgur Image ID found. Please use the direct URL to the image.';
-      setToastInfo({ 'success': false, 'text': message });
-      setToast(true);
-      return;
-    }
+  //   } else {
+  //     const message = 'No Imgur Image ID found. Please use the direct URL to the image.';
+  //     setToastInfo({ 'success': false, 'text': message });
+  //     setToast(true);
+  //     return;
+  //   }
 
-    // Get imgId URL and update canvas
-    getImg(imgId, setImgurImgData)
-      .then(() => {
-        setToastInfo({ 'success': true, 'text': '' });
-        setToast(false);
-      })
-      .catch((err) => {
-        console.log(err.message);
-        setToastInfo({ 'success': false, 'text': err.message });
-        setToast(true);
-      });
-  }
+  //   // Get imgId URL and update canvas
+  //   getImg(imgId, setImgurImgData)
+  //     .then(() => {
+  //       setToastInfo({ 'success': true, 'text': '' });
+  //       setToast(false);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err.message);
+  //       setToastInfo({ 'success': false, 'text': err.message });
+  //       setToast(true);
+  //     });
+  // }
 
-  useEffect(() => {
-    getImgBlob(imgurImgData.link, imgurImgData.id)
-      .then((result) => setImage(result))
-      .catch((err) => console.error(err));
-  }, [imgurImgData]); // eslint-disable-line react-hooks/exhaustive-deps
+  // useEffect(() => {
+  //   getImgBlob(imgurImgData.link, imgurImgData.id)
+  //     .then((result) => setImage(result))
+  //     .catch((err) => console.error(err));
+  // }, [imgurImgData]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  function exportImgur() {
-    const newFilename = filename ? ('carmen-edited_' + filename) : 'carmen-edited.jpg';
-    const parent = editPaneRef.current;
-    const canvas = parent.firstChild;
+  // function exportImgur() {
+  //   const newFilename = filename ? ('carmen-edited_' + filename) : 'carmen-edited.jpg';
+  //   const parent = editPaneRef.current;
+  //   const canvas = parent.firstChild;
 
-    let img = {};
-    img.name = newFilename;
-    img.data = canvas.toDataURL('image/jpeg', 1);
+  //   let img = {};
+  //   img.name = newFilename;
+  //   img.data = canvas.toDataURL('image/jpeg', 1);
 
-    const div =
-      <div className="d-flex align-items-center"> Uploading...
-        <div className="spinner-border ms-auto" role="status" aria-hidden="true"></div>
-      </div>;
-    setToastInfo({ 'success': true, 'text': div });
-    setToast(true);
+  //   const div =
+  //     <div className="d-flex align-items-center"> Uploading...
+  //       <div className="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+  //     </div>;
+  //   setToastInfo({ 'success': true, 'text': div });
+  //   setToast(true);
 
-    try {
-      uploadImg(img, uploadConfirmation);
-    } catch (err) {
-      console.log(err);
-      setToastInfo({ 'success': false, 'text': err.message });
-      setToast(true);
-    }
-  }
+  //   try {
+  //     uploadImg(img, uploadConfirmation);
+  //   } catch (err) {
+  //     console.log(err);
+  //     setToastInfo({ 'success': false, 'text': err.message });
+  //     setToast(true);
+  //   }
+  // }
 
-  /* Display a toast for either success or failure */
-  function uploadConfirmation(result) {
-    console.log(result);
+  // /* Display a toast for either success or failure */
+  // function uploadConfirmation(result) {
+  //   console.log(result);
 
-    if (!result || result.error) {
-      setToastInfo({ 'success': false, 'text': `Error: ${result?.error || 'Unknown Error'}` });
-      setToast(true);
-      return;
-    }
+  //   if (!result || result.error) {
+  //     setToastInfo({ 'success': false, 'text': `Error: ${result?.error || 'Unknown Error'}` });
+  //     setToast(true);
+  //     return;
+  //   }
 
-    const link = result.link || '';
-    const deletehash = result.deletehash || '';
+  //   const link = result.link || '';
+  //   const deletehash = result.deletehash || '';
 
-    const header = /http(s)?:\/\/(www.)?/g;
-    const displayLink = link.replace(header, '');
+  //   const header = /http(s)?:\/\/(www.)?/g;
+  //   const displayLink = link.replace(header, '');
 
-    const a = <a href={link} target="_blank" rel="noreferrer">{displayLink}</a>;
-    const div = <div>Image uploaded to {a}. The code to delete it is <samp>{deletehash}</samp>.</div>;
-    setToastInfo({ 'success': true, 'text': div });
-    setToast(true);
-  }
+  //   const a = <a href={link} target="_blank" rel="noreferrer">{displayLink}</a>;
+  //   const div = <div>Image uploaded to {a}. The code to delete it is <samp>{deletehash}</samp>.</div>;
+  //   setToastInfo({ 'success': true, 'text': div });
+  //   setToast(true);
+  // }
 
-  /* Delete an Image from Imgur using the deletehash */
-  function deleteImage() {
+  // /* Delete an Image from Imgur using the deletehash */
+  // function deleteImage() {
 
-    const form = imgurUrlRef.current;
-    const value = form.value;
+  //   const form = imgurUrlRef.current;
+  //   const value = form.value;
 
-    // deleteHash is 15 chars long
-    const hash = /\w{15}/;
+  //   // deleteHash is 15 chars long
+  //   const hash = /\w{15}/;
 
-    const deletehash = value.match(hash);
-    if (!deletehash) {
-      const error = 'No delete code found. Paste the 15 character delete code into the text box.';
-      setToastInfo({ 'success': false, 'text': error });
-      setToast(true);
-      return;
-    }
+  //   const deletehash = value.match(hash);
+  //   if (!deletehash) {
+  //     const error = 'No delete code found. Paste the 15 character delete code into the text box.';
+  //     setToastInfo({ 'success': false, 'text': error });
+  //     setToast(true);
+  //     return;
+  //   }
 
-    deleteImgur(deletehash, deleteConfirmation)
-      .catch((err) => {
-        console.log(err.message);
-        setToastInfo({ 'success': false, 'text': err.message });
-        setToast(true);
-      });
-  }
+  //   deleteImgur(deletehash, deleteConfirmation)
+  //     .catch((err) => {
+  //       console.log(err.message);
+  //       setToastInfo({ 'success': false, 'text': err.message });
+  //       setToast(true);
+  //     });
+  // }
 
-  function deleteConfirmation(result) {
-    console.log(result);
+  // function deleteConfirmation(result) {
+  //   console.log(result);
 
-    if (!result || !result.success || result.error) {
-      setToastInfo({ 'success': false, 'text': `Error: ${result?.error || 'Unknown Error'}` });
-      setToast(true);
-      return;
-    }
+  //   if (!result || !result.success || result.error) {
+  //     setToastInfo({ 'success': false, 'text': `Error: ${result?.error || 'Unknown Error'}` });
+  //     setToast(true);
+  //     return;
+  //   }
 
-    setToastInfo({ 'success': true, 'text': 'Image successfully deleted.' });
-    setToast(true);
-  }
+  //   setToastInfo({ 'success': true, 'text': 'Image successfully deleted.' });
+  //   setToast(true);
+  // }
 
-  let toast = { toast: toastDisplay, setToast: setToast, toastInfo: toastInfo, setToastInfo: setToastInfo };
-  let imgur = { imgurUrlRef: imgurUrlRef, deleteImage: deleteImage, importImgur: importImgur, exportImgur: exportImgur };
+  // let toast = { toastDisplay: toastDisplay, setToast: setToast, toastInfo: toastInfo, setToastInfo: setToastInfo };
+  // let imgur = { deleteImage: deleteImage };
   let canvasControls = { updateCanvas: updateCanvas };
-  // let canvasControls = { updateCanvas: updateCanvas, setImage: setImage, uploadFile: uploadFile, downloadImage: downloadImage };
 
   return (
     <>
@@ -354,7 +353,7 @@ const CamanCanvas = () => {
         <img id="canvas" alt="Editing Canvas" className="img-fluid" aria-label="Editing Canvas" src={image} />
       </div>
 
-      <FileControls toast={toast} imgur={imgur} canvasControls={canvasControls} editPaneRef={editPaneRef} />
+      <FileControls canvasControls={canvasControls} editPaneRef={editPaneRef} />
 
       <>
         {/* <NotificationToast toast={toastDisplay} setToast={setToast}
