@@ -28,7 +28,7 @@ export function getImg(imageId, setImgData) {
       return res.json();
     })
     .then((data) => {
-      const mime = /image/
+      const mime = /image/;
       if (!mime.test(data.data.type)) {
         throw new Error(`Unsupported Filetype: ${data.data.type}`);
       }

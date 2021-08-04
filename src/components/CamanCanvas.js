@@ -3,7 +3,8 @@ import throttle from 'lodash/throttle';
 
 import { getImg, getImgBlob, getAlbum, uploadImg, deleteImgur } from './ImgurAPI';
 import { CreatePresetList, CreateFilterList } from './CamanControls';
-import { NotificationToast } from './Bootstrap';
+import FileControls from './FileControls';
+// import { NotificationToast } from './Bootstrap';
 
 import image from './../WP.png';
 // import image from './../142.jpg';
@@ -113,7 +114,8 @@ const CamanCanvas = () => {
   /* Button Callback */
   function updatePresets(event) {
     const preset = event.target.id;
-    setPresetList(presetList[preset] ? {} : { [preset]: 1 });
+    // function to guarantee using the latest presetList
+    setPresetList((presetList) => presetList[preset] ? {} : { [preset]: 1 });
   }
 
 
@@ -179,26 +181,27 @@ const CamanCanvas = () => {
   }
 
   /* Take the file from the file browser and set it */
-  function uploadFile(event) {
-    const file = event.target.files[0];
-    setImage(file);
-  }
+  // function uploadFile(event) {
+  //   const file = event.target.files[0];
+  //   setImage(file);
+  // }
 
-  function downloadImage() {
+  // function downloadImage() {
 
-    const newFilename = filename ? ('carmen-edited_' + filename) : 'carmen-edited.jpg';
-    console.log('Downloading', newFilename);
+  //   const newFilename = filename ? ('carmen-edited_' + filename) : 'carmen-edited.jpg';
+  //   console.log('Downloading', newFilename);
 
-    const parent = editPaneRef.current;
-    const canvas = parent.firstChild;
+  //   const parent = editPaneRef.current;
+  //   const canvas = parent.firstChild;
 
-    // create link
-    const link = document.createElement('a');
-    link.download = newFilename;
-    link.href = canvas.toDataURL('image/jpeg', 1);
-    // const e = new MouseEvent('click');
-    link.dispatchEvent(new MouseEvent('click'));
-  }
+  //   // create link
+  //   const link = document.createElement('a');
+  //   link.download = newFilename;
+  //   link.href = canvas.toDataURL('image/jpeg', 1);
+  //   // const e = new MouseEvent('click');
+  //   // link.dispatchEvent(e);
+  //   link.dispatchEvent(new MouseEvent('click'));
+  // }
 
 
   /* Imgur Functions */
@@ -263,6 +266,13 @@ const CamanCanvas = () => {
     let img = {};
     img.name = newFilename;
     img.data = canvas.toDataURL('image/jpeg', 1);
+
+    const div =
+      <div className="d-flex align-items-center"> Uploading...
+        <div className="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+      </div>;
+    setToastInfo({ 'success': true, 'text': div });
+    setToast(true);
 
     try {
       uploadImg(img, uploadConfirmation);
@@ -333,6 +343,10 @@ const CamanCanvas = () => {
     setToast(true);
   }
 
+  let toast = { toast: toastDisplay, setToast: setToast, toastInfo: toastInfo, setToastInfo: setToastInfo };
+  let imgur = { imgurUrlRef: imgurUrlRef, deleteImage: deleteImage, importImgur: importImgur, exportImgur: exportImgur };
+  let canvasControls = { updateCanvas: updateCanvas };
+  // let canvasControls = { updateCanvas: updateCanvas, setImage: setImage, uploadFile: uploadFile, downloadImage: downloadImage };
 
   return (
     <>
@@ -340,7 +354,10 @@ const CamanCanvas = () => {
         <img id="canvas" alt="Editing Canvas" className="img-fluid" aria-label="Editing Canvas" src={image} />
       </div>
 
-      <NotificationToast toast={toastDisplay} setToast={setToast}
+      <FileControls toast={toast} imgur={imgur} canvasControls={canvasControls} editPaneRef={editPaneRef} />
+
+      <>
+        {/* <NotificationToast toast={toastDisplay} setToast={setToast}
         status={toastInfo.success} toastText={toastInfo.text} />
 
       <div className="row my-2 d-flex align-items-end">
@@ -392,7 +409,8 @@ const CamanCanvas = () => {
             <span className="d-none d-md-block">Download Image</span>
           </button>
         </div>
-      </div>
+      </div> */}
+      </>
 
       <div id="filterHolder">
         <div id="filterList" className="container overflow-hidden bg-dark text-center my-3 p-2">
