@@ -2,30 +2,20 @@ import { useEffect, useState, useRef } from 'react';
 
 import { getImg, getImgBlob, getAlbum, uploadImg, deleteImgur } from './ImgurAPI';
 import { NotificationToast } from './Bootstrap';
-// import { Button, Toast } from 'bootstrap';
 
-// let toast = { toastDisplay: toastDisplay, setToast: setToast, toastInfo: toastInfo, setToastInfo: setToastInfo };
-// let imgur = { imgurUrlRef: imgurUrlRef, deleteImage: deleteImage, importImgur: importImgur, exportImgur: exportImgur };
-// let canvasControls = { updateCanvas: updateCanvas };
-
-function FileControls({ canvasControls, editPaneRef }) {
+function FileControls({ updateCanvas, editPaneRef }) {
   const [filename, setFilename] = useState('');
   const [imgurImgData, setImgurImgData] = useState({});
   const [toastDisplay, setToast] = useState(false);
   const [toastInfo, setToastInfo] = useState({ 'success': true, 'text': '' });
   const imgurUrlRef = useRef(null);
 
-  // let toastDisplay, setToast, toastInfo, setToastInfo;
-  // ({ toastDisplay, setToast, toastInfo, setToastInfo } = toast);
-
-  // let deleteImage;
-  // ({ deleteImage } = imgur);
 
   /*
    * Direct image/file changes
    */
 
-  /* Read a file  */
+  /* Read a file to update canvas */
   function setImage(file) {
     const reader = new FileReader();
     if (file) {
@@ -49,7 +39,7 @@ function FileControls({ canvasControls, editPaneRef }) {
       const img = new Image();
       img.src = reader.result;
 
-      img.onload = () => { canvasControls.updateCanvas(img); };
+      img.onload = () => { updateCanvas(img); };
       setToastInfo({ 'success': true, 'text': '' });
       setToast(false);
     };
@@ -77,10 +67,10 @@ function FileControls({ canvasControls, editPaneRef }) {
   }
 
 
-
   /*
    *  ImgurAPI.js calls
    */
+
   /* Import image from form textbox */
   async function importImgur() {
     const form = imgurUrlRef.current;
