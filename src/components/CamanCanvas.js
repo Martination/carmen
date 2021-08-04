@@ -32,12 +32,12 @@ let updateImgFn = () => { };
 const throttledEventListen = throttle((curRenderList) => (updateImgFn(curRenderList)), 1000);
 
 caman.Event.listen('processStart', (job) => {
-  console.log('Start:', job.name);
+  // console.log('Start:', job.name);
   isRendering = true;
 });
 
 caman.Event.listen('processComplete', (job) => {
-  console.log('Finish:', job.name);
+  // console.log('Finish:', job.name);
   isRendering = false;
   backlog = 0;
   if (JSON.stringify(prevRenderList) !== JSON.stringify(curRenderList)) {
@@ -46,9 +46,9 @@ caman.Event.listen('processComplete', (job) => {
 });
 
 
-window.Caman.DEBUG = true
+// window.Caman.DEBUG = true
 const htmlCanvas = '#canvas';
-caman(htmlCanvas, image, function () {
+caman(htmlCanvas, function () {
   this.render();
 });
 
@@ -66,8 +66,6 @@ const CamanCanvas = () => {
 
   /* Combine presets and filters into master adjustment list and update the image */
   useEffect(() => {
-
-    // console.log("New list", filterList);
 
     // Check for invalid presets
     let preset = presetList;
@@ -93,12 +91,10 @@ const CamanCanvas = () => {
     curRenderList = newList;
 
     // If it's not identical, re-render Caman
-    console.log("New list", newList);
     if (JSON.stringify(prevRenderList) !== JSON.stringify(newList)) {
       console.log(newList, prevRenderList, curRenderList, isRendering, backlog);
       if (!isRendering) {
-        // if (backlog) { isRendering = true; }
-        console.log("Throttled New list", newList);
+        if (backlog) { isRendering = true; }
         throttled.current(newList);   // Throttled calls updateImage()
         backlog += 1;
       }
@@ -134,7 +130,6 @@ const CamanCanvas = () => {
 
   function updateImage(adjustmentList) {
     prevRenderList = adjustmentList;
-    console.log("Update image", adjustmentList, prevRenderList);
     caman(htmlCanvas, function () {
       console.log('~~~~ UPDATE IMAGE ~~~~');
       console.log(adjustmentList);
