@@ -16,7 +16,6 @@ const caman = window.Caman;
 // colorize [R,G,B, [0-100]] || ['#eee', [0-100]]
 // curves [[R,G,B], [P0x,P1x], [P2], [P3], [P4]]
 // fillColor [R,G,B] || ['#eee']
-// Greyscale(), Invert()
 
 // Stage 2
 // Crop, Resize, Preset strength, undo/redo
@@ -92,7 +91,6 @@ const CamanCanvas = () => {
 
     // If it's not identical, re-render Caman
     if (JSON.stringify(prevRenderList) !== JSON.stringify(newList)) {
-      console.log(newList, prevRenderList, curRenderList, isRendering, backlog);
       if (!isRendering) {
         if (backlog) { isRendering = true; }
         throttled.current(newList);   // Throttled calls updateImage()
